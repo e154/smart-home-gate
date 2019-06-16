@@ -1,0 +1,71 @@
+package main
+
+import (
+	"fmt"
+)
+
+var (
+	VersionString = "?"
+	RevisionString = "?"
+	RevisionURLString = "?"
+	GeneratedString = "?"
+	DevelopersString = "?"
+	BuildNumString = "?"
+	DockerImageString = "?"
+)
+
+const verboseVersionBanner string = `
+   ___   _ _____ ___                            
+  / __| /_\_   _| __|                           
+ | (_ |/ _ \| | | _|                            
+  \___/_/ \_\_| |___|	%s
+
+Usage: %s [option]
+
+options:
+-v -version - show build version
+help	    - show this help text
+`
+
+const shortVersionBanner = `
+   ___   _ _____ ___                            
+  / __| /_\_   _| __|                           
+ | (_ |/ _ \| | | _|                            
+  \___/_/ \_\_| |___|
+
+%s
+`
+
+func GetHumanVersion() string {
+	version := ""
+
+	if DevelopersString != "" {
+		version = fmt.Sprintf("Generated: %s\n", GeneratedString)
+	}
+
+	if RevisionString != "" {
+		version += fmt.Sprintf("Revision: %s\n", RevisionString)
+	}
+
+	if RevisionURLString != "" {
+		version += fmt.Sprintf("Revision url: %s\n", RevisionURLString)
+	}
+
+	if VersionString != "" {
+		version += fmt.Sprintf("Version: %s\n", VersionString)
+	}
+
+	if DockerImageString != "" {
+		version += fmt.Sprintf("Docker image: %s\n", DockerImageString)
+	}
+
+	if DevelopersString != "" {
+		version += fmt.Sprintf("Developers: %s\n", DevelopersString)
+	}
+
+	if BuildNumString != "" {
+		version += fmt.Sprintf("Build: %s\n", BuildNumString)
+	}
+
+	return version
+}

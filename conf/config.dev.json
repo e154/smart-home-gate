@@ -1,0 +1,14 @@
+{
+  "server_host": "0.0.0.0",
+  "server_port": 3005,
+  "pg_user": "smart_home",
+  "pg_pass": "smart_home",
+  "pg_host": "127.0.0.1",
+  "pg_name": "smart_home_gate",
+  "pg_port": "5432",
+  "pg_debug": false,
+  "pg_logger": false,
+  "pg_max_idle_conns": 10,
+  "pg_max_open_conns": 50,
+  "pg_conn_max_life_time": 30
+}

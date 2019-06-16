@@ -1,0 +1,6 @@
+.idea
+vendor/*
+.DS_Store
+conf/config.json
+conf/dbconfig.yml
+smart-home-gate

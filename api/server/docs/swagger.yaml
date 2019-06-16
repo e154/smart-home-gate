@@ -1,0 +1,36 @@
+basePath: /
+consumes:
+- application/json
+info:
+  contact:
+    email: support@e154.ru
+    name: Alex Filippov
+    url: https://e154.github.io/smart-home-gate/
+  description: This documentation describes APIs found under https://github.com/e154/smart-home-gate
+  license:
+    name: MIT
+    url: https://raw.githubusercontent.com/e154/smart-home-gate/master/LICENSE
+  title: Smart home gate
+  version: 1.0.0
+paths:
+  /:
+    get:
+      consumes:
+      - text/plain
+      operationId: index
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Success response
+      summary: index page
+      tags:
+      - index
+produces:
+- application/json
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
