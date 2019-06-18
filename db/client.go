@@ -1,8 +1,9 @@
 package db
 
 import (
-	"github.com/e154/smart-home/system/uuid"
+	"github.com/e154/smart-home-gate/system/uuid"
 	"github.com/jinzhu/gorm"
+	"net"
 	"time"
 )
 
@@ -11,11 +12,13 @@ type Clients struct {
 }
 
 type Client struct {
-	Id        int64 `gorm:"primary_key"`
-	ClientId  uuid.UUID
-	Token     string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	Id               int64 `gorm:"primary_key"`
+	ClientId         uuid.UUID
+	Token            string
+	TokenGeneratedAt time.Time
+	CreatedAt        time.Time
+	UpdatedAt        time.Time
+	Ip               net.IP
 }
 
 func (m *Client) TableName() string {
@@ -30,10 +33,27 @@ func (n Clients) Add(client *Client) (id int64, err error) {
 	return
 }
 
-func (n Clients) GetById(clientId int64) (client *Client, err error) {
+func (n *Clients) Update(m *Client) (err error) {
+	err = n.Db.Model(&Client{}).
+		Updates(map[string]interface{}{
+			"token":              m.Token,
+			"token_generated_at": m.TokenGeneratedAt,
+		}).
+		Where("client_id = ?", m.ClientId).
+		Error
+	return
+}
+
+func (n Clients) GetById(id int64) (client *Client, err error) {
+	client = &Client{Id: id}
+	err = n.Db.First(&client).Error
+	return
+}
+
+func (n Clients) GetByToken(token string) (client *Client, err error) {
 	client = &Client{}
 	err = n.Db.Model(client).
-		Where("client_id = ?", clientId).
+		Where("token = ?", token).
 		First(&client).
 		Error
 	return

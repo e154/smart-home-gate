@@ -11,13 +11,14 @@ var (
 )
 
 type Adaptors struct {
+	Client *Client
 }
 
 func NewAdaptors(db *gorm.DB,
 	cfg *config.AppConfig) (adaptors *Adaptors) {
 
 	adaptors = &Adaptors{
-
+		Client: GetClientAdaptor(db),
 	}
 
 	return
