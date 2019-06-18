@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/e154/smart-home-gate/api/server"
 	"github.com/e154/smart-home-gate/system/graceful_service"
+	l "github.com/e154/smart-home-gate/system/logging"
 	"github.com/e154/smart-home-gate/system/migrations"
 	"github.com/op/go-logging"
 	"os"
@@ -22,7 +23,7 @@ func main() {
 			fmt.Printf(shortVersionBanner, GetHumanVersion())
 			return
 		default:
-			fmt.Printf(verboseVersionBanner, "v2", os.Args[0])
+			fmt.Printf(verboseVersionBanner, "v1", os.Args[0])
 			return
 		}
 	}
@@ -44,8 +45,10 @@ func start() {
 	}
 
 	err = container.Invoke(func(server *server.Server,
-		graceful *graceful_service.GracefulService) {
+		graceful *graceful_service.GracefulService,
+		back *l.LogBackend) {
 
+		l.Initialize(back)
 		go server.Start()
 
 		graceful.Wait()

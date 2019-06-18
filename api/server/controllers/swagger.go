@@ -1,11 +1,11 @@
 package controllers
 
 import (
+	"github.com/e154/smart-home-gate/system/swaggo/gin-swagger/swaggerFiles"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/net/webdav"
-	"regexp"
-	"github.com/e154/smart-home/system/swaggo/gin-swagger/swaggerFiles"
 	"html/template"
+	"regexp"
 	"strings"
 )
 

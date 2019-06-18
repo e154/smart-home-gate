@@ -11,7 +11,7 @@ type Controllers struct {
 }
 
 func NewControllers(adaptors *adaptors.Adaptors,
-	endpoint *endpoint.Endpoint) *Controllers {
+	endpoint endpoint.IEndpoint) *Controllers {
 	common := NewControllerCommon(adaptors, endpoint)
 	return &Controllers{
 		Index:   NewControllerIndex(common),

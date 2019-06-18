@@ -10,11 +10,12 @@ var (
 )
 
 type Endpoint struct {
+	*Client
 }
 
-func NewEndpoint(adaptors *adaptors.Adaptors) *Endpoint {
-	//common := NewCommonEndpoint(adaptors)
+func NewEndpoint(adaptors *adaptors.Adaptors) IEndpoint {
+	common := NewCommonEndpoint(adaptors)
 	return &Endpoint{
-
+		Client: NewClient(common),
 	}
 }

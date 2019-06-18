@@ -12,6 +12,7 @@ import (
 	"github.com/e154/smart-home-gate/system/migrations"
 	"github.com/e154/smart-home-gate/system/orm"
 	"github.com/e154/smart-home-gate/system/stream"
+	streamControllers "github.com/e154/smart-home-gate/system/stream/controllers"
 )
 
 func BuildContainer() (container *dig.Container) {
@@ -32,6 +33,7 @@ func BuildContainer() (container *dig.Container) {
 	container.Provide(logging.NewLogrus)
 	container.Provide(logging.NewLogBackend)
 	container.Provide(stream.NewStreamService)
+	container.Provide(streamControllers.NewStreamControllers)
 	container.Provide(stream.NewHub)
 	container.Provide(endpoint.NewEndpoint)
 

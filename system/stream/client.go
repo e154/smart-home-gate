@@ -7,56 +7,9 @@ import (
 )
 
 type Client struct {
-	ConnType  ConnectType
-	Connect   *websocket.Conn
-	Ip        string
-	Referer   string
-	UserAgent string
-	Width     int
-	Height    int
-	Cookie    bool
-	Language  string
-	Platform  string
-	Location  string
-	Href      string
-
-	Send chan []byte
-}
-
-func (c *Client) UpdateInfo(info interface{}) {
-	v, ok := info.(map[string]interface{})
-	if !ok {
-		return
-	}
-
-	width, ok := v["width"].(float64)
-	if ok {
-		c.Width = int(width)
-	}
-
-	if height, ok := v["height"].(float64); ok {
-		c.Height = int(height)
-	}
-
-	if cookie, ok := v["cookie"].(bool); ok {
-		c.Cookie = cookie
-	}
-
-	if language, ok := v["language"].(string); ok {
-		c.Language = language
-	}
-
-	if platform, ok := v["platform"].(string); ok {
-		c.Platform = platform
-	}
-
-	if location, ok := v["location"].(string); ok {
-		c.Location = location
-	}
-
-	if href, ok := v["href"].(string); ok {
-		c.Href = href
-	}
+	Connect  *websocket.Conn
+	Ip       string
+	Send     chan []byte
 }
 
 func (c *Client) Notify(t, b string) {
@@ -89,19 +42,12 @@ func (c *Client) WritePump() {
 		select {
 		case message, ok := <-c.Send:
 
-			switch c.ConnType {
-			//case SOCKJS:
-			//	c.Session.Send(string(message))
-			case WEBSOCK:
-				if !ok {
-					c.Write(websocket.CloseMessage, []byte{})
-					return
-				}
-				if err := c.Write(websocket.TextMessage, message); err != nil {
-					return
-				}
-			default:
-
+			if !ok {
+				_ = c.Write(websocket.CloseMessage, []byte{})
+				return
+			}
+			if err := c.Write(websocket.TextMessage, message); err != nil {
+				return
 			}
 
 		case <-ticker.C:

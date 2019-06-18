@@ -12,11 +12,11 @@ var (
 
 type ControllerCommon struct {
 	adaptors *adaptors.Adaptors
-	endpoint *endpoint.Endpoint
+	endpoint endpoint.IEndpoint
 }
 
 func NewControllerCommon(adaptors *adaptors.Adaptors,
-	endpoint *endpoint.Endpoint) *ControllerCommon {
+	endpoint endpoint.IEndpoint) *ControllerCommon {
 	return &ControllerCommon{
 		adaptors: adaptors,
 		endpoint: endpoint,

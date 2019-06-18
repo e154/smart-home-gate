@@ -7,12 +7,6 @@ import (
 	"net/http"
 )
 
-type ConnectType string
-
-const (
-	WEBSOCK = ConnectType("websock")
-)
-
 var (
 	wsupgrader = websocket.Upgrader{
 		ReadBufferSize:  1024,
@@ -42,11 +36,8 @@ func (w *StreamService) Ws(ctx *gin.Context) {
 	}
 
 	client := &Client{
-		ConnType:  WEBSOCK,
 		Connect:   conn,
 		Ip:        ctx.ClientIP(),
-		Referer:   ctx.Request.Referer(),
-		UserAgent: ctx.Request.UserAgent(),
 		Send:      make(chan []byte),
 	}
 
