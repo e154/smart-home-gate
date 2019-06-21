@@ -10,8 +10,9 @@ type IEndpoint interface {
 }
 
 type IEndpointMobile interface {
-	RegisterMobile() (string, error)
+	RegisterMobile(server *m.Server) (string, error)
 	RemoveMobileToken(*m.Mobile) error
+	ListMobileToken(limit, offset int64) (list []*m.Mobile, total int64, err error)
 }
 
 type IEndpointServer interface {

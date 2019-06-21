@@ -16,13 +16,21 @@ func NewControllerMobile(common *ControllerCommon,
 		ControllerCommon: common,
 	}
 
-	// mobile
+	// register methods
 	stream.Subscribe("register_mobile", mobile.RegisterMobile)
+	stream.Subscribe("remove_mobile", mobile.RemoveMobileToken)
+	stream.Subscribe("mobile_token_list", mobile.ListMobileTokens)
 
 	return mobile
 }
 
 func (c *ControllerMobile) RegisterMobile(client *stream.Client, value interface{}) {
+
+	server, err := c.GetServer(client)
+	if err != nil {
+		c.Err(client, value, err)
+		return
+	}
 
 	log.Info("call register mobile")
 
@@ -31,7 +39,7 @@ func (c *ControllerMobile) RegisterMobile(client *stream.Client, value interface
 		return
 	}
 
-	token, err := c.endpoint.RegisterMobile()
+	token, err := c.endpoint.RegisterMobile(server)
 	if err != nil {
 		c.Err(client, value, err)
 		return
@@ -66,5 +74,27 @@ func (c *ControllerMobile) RemoveMobileToken(client *stream.Client, value interf
 	}
 
 	msg, _ := json.Marshal(map[string]interface{}{"id": v["id"], "status": "ok"})
+	client.Send <- msg
+}
+
+func (c *ControllerMobile) ListMobileTokens(client *stream.Client, value interface{}) {
+
+	v, ok := reflect.ValueOf(value).Interface().(map[string]interface{})
+	if !ok {
+		return
+	}
+
+	list, total, err := c.endpoint.ListMobileToken(99, 0)
+	if err != nil {
+		c.Err(client, value, err)
+		return
+	}
+
+	tokenList := make([]string, 0)
+	for _, m := range list {
+		tokenList = append(tokenList, m.Token.String())
+	}
+
+	msg, _ := json.Marshal(map[string]interface{}{"id": v["id"], "status": "ok", "total": total, "token_list": tokenList})
 	client.Send <- msg
 }

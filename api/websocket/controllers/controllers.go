@@ -13,6 +13,7 @@ var (
 
 type Controllers struct {
 	Server *ControllerServer
+	Mobile *ControllerMobile
 }
 
 func NewControllers(adaptors *adaptors.Adaptors,
@@ -21,5 +22,6 @@ func NewControllers(adaptors *adaptors.Adaptors,
 	common := NewControllerCommon(adaptors, stream, endpoint)
 	return &Controllers{
 		Server: NewControllerServer(common, stream),
+		Mobile: NewControllerMobile(common, stream),
 	}
 }

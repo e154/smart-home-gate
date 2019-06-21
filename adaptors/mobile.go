@@ -120,7 +120,7 @@ func (n *Mobile) GetByAccessToken(accessToken string) (ver *m.Mobile, err error)
 		return
 	}
 
-	if hash != common.Sha256(requestRandomId+dbVer.Token+fmt.Sprintf("%d", timestamp)) {
+	if hash != common.Sha256(requestRandomId+dbVer.Token.String()+fmt.Sprintf("%d", timestamp)) {
 		err = fmt.Errorf("Wrong auth data, wrong hash")
 		return
 	}
@@ -151,10 +151,16 @@ func (n *Mobile) fromDb(dbVer *db.Mobile) (ver *m.Mobile) {
 	if err != nil {
 		log.Error(err.Error())
 	}
+
+	serverId, err := common.GetHashFromId(dbVer.ServerId, HashSalt)
+	if err != nil {
+		log.Error(err.Error())
+	}
+
 	ver = &m.Mobile{
 		Id:        id,
 		Token:     dbVer.Token,
-		ServerId:  dbVer.ServerId,
+		ServerId:  serverId,
 		CreatedAt: dbVer.CreatedAt,
 		UpdatedAt: dbVer.UpdatedAt,
 	}
@@ -167,11 +173,17 @@ func (n *Mobile) toDb(ver *m.Mobile) (dbVer *db.Mobile) {
 	if err != nil {
 		log.Error(err.Error())
 	}
+	serverId, err := common.GetIdFromHash(ver.ServerId, HashSalt)
+	if err != nil {
+		log.Error(err.Error())
+	}
 	dbVer = &db.Mobile{
 		Id:        id,
+		ServerId:  serverId,
 		Token:     ver.Token,
 		CreatedAt: ver.CreatedAt,
 		UpdatedAt: ver.UpdatedAt,
 	}
+
 	return
 }

@@ -16,8 +16,9 @@ func NewControllerServer(common *ControllerCommon,
 		ControllerCommon: common,
 	}
 
-	// server
+	// register methods
 	stream.Subscribe("register_server", server.RegisterServer)
+	stream.Subscribe("remove_server", server.RemoveServerToken)
 
 	return server
 }

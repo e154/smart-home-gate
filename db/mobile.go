@@ -1,6 +1,7 @@
 package db
 
 import (
+	"github.com/e154/smart-home-gate/system/uuid"
 	"github.com/jinzhu/gorm"
 	"time"
 )
@@ -11,7 +12,7 @@ type Mobiles struct {
 
 type Mobile struct {
 	Id        int64 `gorm:"primary_key"`
-	Token     string
+	Token     uuid.UUID
 	ServerId  int64
 	Server    *Server
 	CreatedAt time.Time
@@ -23,7 +24,8 @@ func (m *Mobile) TableName() string {
 }
 
 func (n Mobiles) Add(mobile *Mobile) (id int64, err error) {
-	if err = n.Db.Create(&mobile).Error; err != nil {
+
+	if err = n.Db.Create(mobile).Error; err != nil {
 		return
 	}
 	id = mobile.Id
