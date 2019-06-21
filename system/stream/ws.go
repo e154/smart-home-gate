@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"net/http"
+	"strings"
 )
 
 var (
@@ -36,9 +37,10 @@ func (w *StreamService) Ws(ctx *gin.Context) {
 	}
 
 	client := &Client{
-		Connect:   conn,
-		Ip:        ctx.ClientIP(),
-		Send:      make(chan []byte),
+		Connect: conn,
+		Ip:      ctx.ClientIP(),
+		Send:    make(chan []byte),
+		Token:   strings.ToLower(ctx.Request.Header.Get("X-API-Key")),
 	}
 
 	go client.WritePump()

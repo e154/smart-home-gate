@@ -7,9 +7,10 @@ import (
 )
 
 type Client struct {
-	Connect  *websocket.Conn
-	Ip       string
-	Send     chan []byte
+	Connect *websocket.Conn
+	Ip      string
+	Send    chan []byte
+	Token   string
 }
 
 func (c *Client) Notify(t, b string) {

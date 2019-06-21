@@ -1,9 +1,20 @@
 package endpoint
 
+import (
+	m "github.com/e154/smart-home-gate/models"
+)
+
 type IEndpoint interface {
-	IEndpointClient
+	IEndpointMobile
+	IEndpointServer
 }
 
-type IEndpointClient interface {
-	GetClientToken(string) (string, error)
+type IEndpointMobile interface {
+	RegisterMobile() (string, error)
+	RemoveMobileToken(*m.Mobile) error
+}
+
+type IEndpointServer interface {
+	RegisterServer() (string, error)
+	RemoveServerToken(*m.Server) error
 }

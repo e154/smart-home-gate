@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/e154/smart-home-gate/api/server"
+	"github.com/e154/smart-home-gate/api/websocket"
 	"github.com/e154/smart-home-gate/system/graceful_service"
 	l "github.com/e154/smart-home-gate/system/logging"
 	"github.com/e154/smart-home-gate/system/migrations"
@@ -46,10 +47,12 @@ func start() {
 
 	err = container.Invoke(func(server *server.Server,
 		graceful *graceful_service.GracefulService,
-		back *l.LogBackend) {
+		back *l.LogBackend,
+		ws *websocket.WebSocket) {
 
 		l.Initialize(back)
 		go server.Start()
+		go ws.Start()
 
 		graceful.Wait()
 	})

@@ -30,7 +30,6 @@ import (
 	"fmt"
 	"github.com/e154/smart-home-gate/api/server/controllers"
 	"github.com/e154/smart-home-gate/system/stream"
-	streamControllers "github.com/e154/smart-home-gate/system/stream/controllers"
 	"github.com/gin-gonic/gin"
 	"github.com/op/go-logging"
 	"net/http"
@@ -77,9 +76,8 @@ func (s *Server) Shutdown() {
 }
 
 func NewServer(cfg *ServerConfig,
-	ctrls *controllers.Controllers,
-	streamService *stream.StreamService,
-	_ *streamControllers.StreamControllers) (newServer *Server) {
+	controllers *controllers.Controllers,
+	streamService *stream.StreamService) (newServer *Server) {
 
 	logger := &ServerLogger{log}
 
@@ -93,7 +91,7 @@ func NewServer(cfg *ServerConfig,
 
 	newServer = &Server{
 		Config:        cfg,
-		Controllers:   ctrls,
+		Controllers:   controllers,
 		engine:        engine,
 		logger:        logger,
 		streamService: streamService,

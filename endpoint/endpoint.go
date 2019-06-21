@@ -10,12 +10,14 @@ var (
 )
 
 type Endpoint struct {
-	*Client
+	*Mobile
+	*Server
 }
 
 func NewEndpoint(adaptors *adaptors.Adaptors) IEndpoint {
 	common := NewCommonEndpoint(adaptors)
 	return &Endpoint{
-		Client: NewClient(common),
+		Mobile: NewMobile(common),
+		Server: NewServer(common),
 	}
 }

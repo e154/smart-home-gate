@@ -107,9 +107,6 @@ func (h *Hub) Recv(client *Client, message []byte) {
 	for key, value := range re {
 
 		switch key {
-		//case "client_info":
-			//client.UpdateInfo(value)
-
 		default:
 			for command, f := range h.subscribers {
 				if key == command {

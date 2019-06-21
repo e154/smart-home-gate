@@ -7,18 +7,23 @@ import (
 )
 
 var (
-	log = logging.MustGetLogger("adaptors")
+	log      = logging.MustGetLogger("adaptors")
+	HashSalt string
 )
 
 type Adaptors struct {
-	Client *Client
+	Server   *Server
+	Mobile   *Mobile
+	Variable *Variable
 }
 
 func NewAdaptors(db *gorm.DB,
 	cfg *config.AppConfig) (adaptors *Adaptors) {
 
 	adaptors = &Adaptors{
-		Client: GetClientAdaptor(db),
+		Server:   GetServerAdaptor(db),
+		Mobile:   GetMobileAdaptor(db),
+		Variable: GetVariableAdaptor(db),
 	}
 
 	return
