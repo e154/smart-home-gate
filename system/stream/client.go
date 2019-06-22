@@ -41,7 +41,7 @@ func (c *Client) WritePump() {
 	defer func() {
 		ticker.Stop()
 		if c.Connect != nil {
-			c.Connect.Close()
+			_ = c.Connect.Close()
 		}
 	}()
 
@@ -66,9 +66,5 @@ func (c *Client) WritePump() {
 }
 
 func (c *Client) Close() {
-
-	err := c.Write(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
-	if err != nil {
-		return
-	}
+	_ = c.Write(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 }
