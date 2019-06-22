@@ -1,7 +1,6 @@
 package stream
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/gorilla/websocket"
 	"io/ioutil"
@@ -20,7 +19,7 @@ const (
 
 type Hub struct {
 	sessions    map[*Client]bool
-	subscribers map[string]func(client *Client, value interface{})
+	subscribers map[string]func(client *Client, msg Message)
 	sync.Mutex
 	broadcast chan []byte
 	interrupt chan os.Signal
@@ -34,7 +33,7 @@ func NewHub() *Hub {
 	hub := &Hub{
 		sessions:    make(map[*Client]bool),
 		broadcast:   make(chan []byte, maxMessageSize),
-		subscribers: make(map[string]func(client *Client, value interface{})),
+		subscribers: make(map[string]func(client *Client, msg Message)),
 		interrupt:   interrupt,
 	}
 	go hub.Run()
@@ -94,24 +93,22 @@ func (h *Hub) Run() {
 	}
 }
 
-func (h *Hub) Recv(client *Client, message []byte) {
+func (h *Hub) Recv(client *Client, b []byte) {
 
-	fmt.Printf("client(%v), message(%v)\n", client, string(message))
+	fmt.Printf("client(%v), message(%v)\n", client, string(b))
 
-	re := map[string]interface{}{}
-	if err := json.Unmarshal(message, &re); err != nil {
+	msg, err := NewMessage(b)
+	if err != nil {
 		log.Error(err.Error())
 		return
 	}
 
-	for key, value := range re {
+	switch msg.Command {
+	default:
+		for command, f := range h.subscribers {
 
-		switch key {
-		default:
-			for command, f := range h.subscribers {
-				if key == command {
-					f(client, value)
-				}
+			if msg.Command == command {
+				f(client, msg)
 			}
 		}
 	}
@@ -137,7 +134,7 @@ func (h *Hub) Clients() (clients []*Client) {
 	return
 }
 
-func (h *Hub) Subscribe(command string, f func(client *Client, value interface{})) {
+func (h *Hub) Subscribe(command string, f func(client *Client, msg Message)) {
 	log.Infof("subscribe %s", command)
 	if h.subscribers[command] != nil {
 		delete(h.subscribers, command)

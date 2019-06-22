@@ -1,9 +1,7 @@
 package controllers
 
 import (
-	"encoding/json"
 	"github.com/e154/smart-home-gate/system/stream"
-	"reflect"
 )
 
 type ControllerMobile struct {
@@ -24,69 +22,57 @@ func NewControllerMobile(common *ControllerCommon,
 	return mobile
 }
 
-func (c *ControllerMobile) RegisterMobile(client *stream.Client, value interface{}) {
+func (c *ControllerMobile) RegisterMobile(client *stream.Client, message stream.Message) {
 
 	server, err := c.GetServer(client)
 	if err != nil {
-		c.Err(client, value, err)
+		c.Err(client, message, err)
 		return
 	}
 
 	log.Info("call register mobile")
 
-	v, ok := reflect.ValueOf(value).Interface().(map[string]interface{})
-	if !ok {
-		return
-	}
-
 	token, err := c.endpoint.RegisterMobile(server)
 	if err != nil {
-		c.Err(client, value, err)
+		c.Err(client, message, err)
 		return
 	}
 
 	client.Token = token
 
-	msg, _ := json.Marshal(map[string]interface{}{"id": v["id"], "token": token})
-	client.Send <- msg
+	payload := map[string]interface{}{
+		"token": token,
+	}
+	response := message.Response(payload)
+
+	client.Send <- response.Pack()
 
 	return
 }
 
-func (c *ControllerMobile) RemoveMobileToken(client *stream.Client, value interface{}) {
+func (c *ControllerMobile) RemoveMobileToken(client *stream.Client, message stream.Message) {
 
 	log.Info("call remove mobile")
 
-	v, ok := reflect.ValueOf(value).Interface().(map[string]interface{})
-	if !ok {
-		return
-	}
-
 	mobile, err := c.GetMobile(client)
 	if err != nil {
-		c.Err(client, value, err)
+		c.Err(client, message, err)
 		return
 	}
 
 	if err = c.endpoint.RemoveMobileToken(mobile); err != nil {
-		c.Err(client, value, err)
+		c.Err(client, message, err)
 		return
 	}
 
-	msg, _ := json.Marshal(map[string]interface{}{"id": v["id"], "status": "ok"})
-	client.Send <- msg
+	client.Send <- message.Success().Pack()
 }
 
-func (c *ControllerMobile) ListMobileTokens(client *stream.Client, value interface{}) {
-
-	v, ok := reflect.ValueOf(value).Interface().(map[string]interface{})
-	if !ok {
-		return
-	}
+func (c *ControllerMobile) ListMobileTokens(client *stream.Client, message stream.Message) {
 
 	list, total, err := c.endpoint.ListMobileToken(99, 0)
 	if err != nil {
-		c.Err(client, value, err)
+		c.Err(client, message, err)
 		return
 	}
 
@@ -95,6 +81,11 @@ func (c *ControllerMobile) ListMobileTokens(client *stream.Client, value interfa
 		tokenList = append(tokenList, m.Token.String())
 	}
 
-	msg, _ := json.Marshal(map[string]interface{}{"id": v["id"], "status": "ok", "total": total, "token_list": tokenList})
-	client.Send <- msg
+	payload := map[string]interface{}{
+		"total":      total,
+		"token_list": tokenList,
+	}
+	response := message.Response(payload)
+
+	client.Send <- response.Pack()
 }

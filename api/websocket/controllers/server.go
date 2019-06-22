@@ -1,9 +1,7 @@
 package controllers
 
 import (
-	"encoding/json"
 	"github.com/e154/smart-home-gate/system/stream"
-	"reflect"
 )
 
 type ControllerServer struct {
@@ -23,49 +21,42 @@ func NewControllerServer(common *ControllerCommon,
 	return server
 }
 
-func (c *ControllerServer) RegisterServer(client *stream.Client, value interface{}) {
+func (c *ControllerServer) RegisterServer(client *stream.Client, message stream.Message) {
 
 	log.Info("call register server")
 
-	v, ok := reflect.ValueOf(value).Interface().(map[string]interface{})
-	if !ok {
-		return
-	}
-
 	token, err := c.endpoint.RegisterServer()
 	if err != nil {
-		c.Err(client, value, err)
+		c.Err(client, message, err)
 		return
 	}
 
 	client.Token = token
 
-	msg, _ := json.Marshal(map[string]interface{}{"id": v["id"], "token": token})
-	client.Send <- msg
+	payload := map[string]interface{}{
+		"token": token,
+	}
+	response := message.Response(payload)
+
+	client.Send <- response.Pack()
 
 	return
 }
 
-func (c *ControllerServer) RemoveServerToken(client *stream.Client, value interface{}) {
+func (c *ControllerServer) RemoveServerToken(client *stream.Client, message stream.Message) {
 
 	log.Info("call remove server")
 
-	v, ok := reflect.ValueOf(value).Interface().(map[string]interface{})
-	if !ok {
-		return
-	}
-
 	server, err := c.GetServer(client)
 	if err != nil {
-		c.Err(client, value, err)
+		c.Err(client, message, err)
 		return
 	}
 
 	if err = c.endpoint.RemoveServerToken(server); err != nil {
-		c.Err(client, value, err)
+		c.Err(client, message, err)
 		return
 	}
 
-	msg, _ := json.Marshal(map[string]interface{}{"id": v["id"], "status": "ok"})
-	client.Send <- msg
+	client.Send <- message.Success().Pack()
 }

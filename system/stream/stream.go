@@ -2,6 +2,7 @@ package stream
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/op/go-logging"
@@ -34,7 +35,7 @@ func (s *StreamService) Broadcast(message []byte) {
 	s.Hub.Broadcast(message)
 }
 
-func (s *StreamService) Subscribe(command string, f func(client *Client, value interface{})) {
+func (s *StreamService) Subscribe(command string, f func(client *Client, msg Message)) {
 	s.Hub.Subscribe(command, f)
 }
 
@@ -42,11 +43,15 @@ func (s *StreamService) UnSubscribe(command string) {
 	s.Hub.UnSubscribe(command)
 }
 
-func (s *StreamService) AddClient(client *Client) {
-	s.Hub.AddClient(client)
-}
-
 func (w *StreamService) Ws(ctx *gin.Context) {
+
+	clientType := strings.ToLower(ctx.Request.Header.Get("X-Client-Type"))
+	switch clientType {
+	case ClientTypeServer, ClientTypeMobile:
+	default:
+		ctx.AbortWithError(400, fmt.Errorf("unknown client type %v", clientType))
+		return
+	}
 
 	// CORS
 	ctx.Writer.Header().Del("Access-Control-Allow-Credentials")
@@ -66,7 +71,7 @@ func (w *StreamService) Ws(ctx *gin.Context) {
 		Ip:      ctx.ClientIP(),
 		Send:    make(chan []byte),
 		Token:   ctx.Request.Header.Get("X-API-Key"),
-		Type:    strings.ToLower(ctx.Request.Header.Get("X-Client-Api")),
+		Type:    clientType,
 	}
 
 	go client.WritePump()

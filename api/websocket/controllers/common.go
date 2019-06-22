@@ -7,7 +7,6 @@ import (
 	"github.com/e154/smart-home-gate/endpoint"
 	m "github.com/e154/smart-home-gate/models"
 	"github.com/e154/smart-home-gate/system/stream"
-	"reflect"
 )
 
 type ControllerCommon struct {
@@ -60,13 +59,7 @@ func (c *ControllerCommon) GetMobile(client *stream.Client) (mobile *m.Mobile, e
 	return
 }
 
-func (c *ControllerCommon) Err(client *stream.Client, value interface{}, err error) {
-
-	v, ok := reflect.ValueOf(value).Interface().(map[string]interface{})
-	if !ok {
-		return
-	}
-
-	msg, _ := json.Marshal(map[string]interface{}{"id": v["id"], "error": err.Error()})
+func (c *ControllerCommon) Err(client *stream.Client, message stream.Message, err error) {
+	msg, _ := json.Marshal(map[string]interface{}{"id": message.Id, "error": err.Error()})
 	client.Send <- msg
 }
