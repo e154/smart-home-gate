@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"net/http"
+	"strings"
 )
 
 var (
@@ -30,9 +31,6 @@ func (w *StreamService) Ws(ctx *gin.Context) {
 	if _, ok := err.(websocket.HandshakeError); ok {
 		ctx.AbortWithError(400, errors.New("not a websocket handshake"))
 		return
-	} else if err != nil {
-		ctx.AbortWithError(400, err)
-		return
 	}
 
 	client := &Client{
@@ -40,6 +38,7 @@ func (w *StreamService) Ws(ctx *gin.Context) {
 		Ip:      ctx.ClientIP(),
 		Send:    make(chan []byte),
 		Token:   ctx.Request.Header.Get("X-API-Key"),
+		Type:    strings.ToLower(ctx.Request.Header.Get("X-Client-Api")),
 	}
 
 	go client.WritePump()

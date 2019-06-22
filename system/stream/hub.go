@@ -51,7 +51,7 @@ func (h *Hub) AddClient(client *Client) {
 
 	h.sessions[client] = true
 
-	log.Infof("new websocket xsession established, from ip: %s", client.Ip)
+	log.Infof("new websocket session established, from ip(%s), type(%v)", client.Ip, client.Type)
 
 	_ = client.Connect.SetReadDeadline(time.Now().Add(pongWait))
 	client.Connect.SetPongHandler(func(string) error {

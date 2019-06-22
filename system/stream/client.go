@@ -6,11 +6,17 @@ import (
 	"time"
 )
 
+const (
+	ClientTypeServer = "server"
+	ClientTypeMobile = "mobile"
+)
+
 type Client struct {
 	Connect *websocket.Conn
 	Ip      string
 	Send    chan []byte
 	Token   string
+	Type    string
 }
 
 func (c *Client) Notify(t, b string) {
