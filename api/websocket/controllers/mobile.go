@@ -38,8 +38,6 @@ func (c *ControllerMobile) RegisterMobile(client *stream.Client, message stream.
 		return
 	}
 
-	client.Token = token
-
 	payload := map[string]interface{}{
 		"token": token,
 	}
@@ -54,13 +52,15 @@ func (c *ControllerMobile) RemoveMobileToken(client *stream.Client, message stre
 
 	log.Info("call remove mobile")
 
-	mobile, err := c.GetMobile(client)
+	server, err := c.GetServer(client)
 	if err != nil {
 		c.Err(client, message, err)
 		return
 	}
 
-	if err = c.endpoint.RemoveMobileToken(mobile); err != nil {
+	token := message.Payload["token"].(string)
+
+	if err = c.endpoint.RemoveMobileToken(server, token); err != nil {
 		c.Err(client, message, err)
 		return
 	}
@@ -70,19 +70,19 @@ func (c *ControllerMobile) RemoveMobileToken(client *stream.Client, message stre
 
 func (c *ControllerMobile) ListMobileTokens(client *stream.Client, message stream.Message) {
 
-	list, total, err := c.endpoint.ListMobileToken(99, 0)
+	server, err := c.GetServer(client)
 	if err != nil {
 		c.Err(client, message, err)
 		return
 	}
 
 	tokenList := make([]string, 0)
-	for _, m := range list {
-		tokenList = append(tokenList, m.Token.String())
+	for _, m := range server.Mobiles {
+		tokenList = append(tokenList, m.GenAccessToken())
 	}
 
 	payload := map[string]interface{}{
-		"total":      total,
+		"total":      len(tokenList),
 		"token_list": tokenList,
 	}
 	response := message.Response(payload)

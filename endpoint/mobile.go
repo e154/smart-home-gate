@@ -1,6 +1,7 @@
 package endpoint
 
 import (
+	"errors"
 	m "github.com/e154/smart-home-gate/models"
 	"github.com/e154/smart-home-gate/system/uuid"
 )
@@ -29,8 +30,28 @@ func (c *Mobile) RegisterMobile(server *m.Server) (token string, err error) {
 	return
 }
 
-func (c *Mobile) RemoveMobileToken(mobile *m.Mobile) (err error) {
+func (c *Mobile) RemoveMobileToken(server *m.Server, token string) (err error) {
+
+	mobile, err := c.adaptors.Mobile.GetByAccessToken(token)
+	if err != nil {
+		return
+	}
+
+	var exist bool
+	for _, m := range server.Mobiles {
+		if m.Token == mobile.Token {
+			exist = true
+		}
+	}
+
+	if !exist {
+		err = errors.New("mobile not found")
+		return
+	}
+
+
 	err = c.adaptors.Mobile.Remove(mobile)
+
 	return
 }
 

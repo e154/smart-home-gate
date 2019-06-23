@@ -2,6 +2,7 @@ package stream
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/e154/smart-home-gate/system/uuid"
 )
 
@@ -62,4 +63,15 @@ func (m *Message) Error(err error) *Message {
 		Status:  StatusError,
 	}
 	return msg
+}
+
+func (m *Message) IsError() (err error) {
+	if m.Status != StatusError {
+		return
+	}
+	if _, ok := m.Payload["error"]; !ok {
+		return
+	}
+	err = fmt.Errorf("%v", m.Payload["error"])
+	return
 }

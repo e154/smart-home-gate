@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/e154/smart-home-gate/adaptors"
 	"github.com/e154/smart-home-gate/endpoint"
@@ -60,6 +59,13 @@ func (c *ControllerCommon) GetMobile(client *stream.Client) (mobile *m.Mobile, e
 }
 
 func (c *ControllerCommon) Err(client *stream.Client, message stream.Message, err error) {
-	msg, _ := json.Marshal(map[string]interface{}{"id": message.Id, "error": err.Error()})
-	client.Send <- msg
+	msg := stream.Message{
+		Id: message.Id,
+		Forward: stream.Response,
+		Status: stream.StatusError,
+		Payload: map[string]interface{}{
+			"error": err.Error(),
+		},
+	}
+	client.Send <- msg.Pack()
 }

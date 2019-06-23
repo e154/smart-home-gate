@@ -60,7 +60,7 @@ func (h *Hub) AddClient(client *Client) {
 	for {
 		op, r, err := client.Connect.NextReader()
 		if err != nil {
-			log.Error(err.Error())
+			log.Debug(err.Error())
 			break
 		}
 		switch op {
