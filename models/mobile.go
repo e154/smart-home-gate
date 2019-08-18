@@ -18,7 +18,7 @@ type Mobile struct {
 func (s Mobile) GenAccessToken() (token string) {
 
 	var requestId = common.RandomString(10, common.Charset)
-	var timestamp = time.Now().Unix()
+	var timestamp = s.CreatedAt.Unix()
 	token = fmt.Sprintf("%s-%s-%d-%s", s.Id, requestId, timestamp, common.Sha256(requestId+s.Token.String()+fmt.Sprintf("%d", timestamp)))
 
 	return

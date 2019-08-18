@@ -57,6 +57,7 @@ func (n Mobiles) GetByToken(token string) (mobile *Mobile, err error) {
 	mobile = &Mobile{}
 	err = n.Db.Model(mobile).
 		Where("token = ?", token).
+		Preload("Server").
 		First(&mobile).
 		Error
 	return

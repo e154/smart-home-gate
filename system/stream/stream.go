@@ -77,3 +77,8 @@ func (w *StreamService) Ws(ctx *gin.Context) {
 	go client.WritePump()
 	w.Hub.AddClient(client)
 }
+
+func (s *StreamService) GetClientByToken(token string) (client *Client, err error) {
+	client, err = s.Hub.GetClientByToken(token)
+	return
+}

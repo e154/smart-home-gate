@@ -74,6 +74,21 @@ func (h *Hub) AddClient(client *Client) {
 	}
 }
 
+func (h *Hub) GetClientByToken(token string) (client *Client, err error) {
+
+	for cli, _ := range h.sessions {
+		if cli.Token == token {
+			client = cli
+			return
+		}
+	}
+
+	if client == nil {
+		err = fmt.Errorf("not found")
+	}
+	return
+}
+
 func (h *Hub) Run() {
 
 	for {
