@@ -12,6 +12,7 @@ const (
 )
 
 type Client struct {
+	Id      string
 	Connect *websocket.Conn
 	Ip      string
 	Send    chan []byte

@@ -3,10 +3,13 @@ package stream
 import (
 	"errors"
 	"fmt"
+	"github.com/e154/smart-home-gate/adaptors"
+	"github.com/e154/smart-home-gate/common"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/op/go-logging"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -22,12 +25,15 @@ var (
 )
 
 type StreamService struct {
-	Hub *Hub
+	adaptors *adaptors.Adaptors
+	Hub      *Hub
 }
 
-func NewStreamService(hub *Hub) *StreamService {
+func NewStreamService(hub *Hub,
+	adaptors *adaptors.Adaptors) *StreamService {
 	return &StreamService{
-		Hub: hub,
+		Hub:      hub,
+		adaptors: adaptors,
 	}
 }
 
@@ -45,12 +51,71 @@ func (s *StreamService) UnSubscribe(command string) {
 
 func (w *StreamService) Ws(ctx *gin.Context) {
 
+	accessToken := ctx.Request.Header.Get("X-API-Key")
 	clientType := strings.ToLower(ctx.Request.Header.Get("X-Client-Type"))
-	switch clientType {
-	case ClientTypeServer, ClientTypeMobile:
-	default:
-		ctx.AbortWithError(400, fmt.Errorf("unknown client type %v", clientType))
-		return
+
+	var token string
+
+	var clientId string
+	if accessToken != "" {
+		data := strings.Split(accessToken, "-")
+		if len(data) != 4 {
+			ctx.AbortWithError(401, errors.New("unauthorized access"))
+			return
+		}
+
+		requestRandomId := data[1]
+		hash := data[3]
+
+		timestamp, errw := strconv.Atoi(data[2])
+		if errw != nil {
+			ctx.AbortWithError(401, errors.New("unauthorized access"))
+			return
+		}
+
+		if len(requestRandomId) < 8 {
+			ctx.AbortWithError(401, errors.New("unauthorized access"))
+			return
+		}
+
+		switch clientType {
+		case ClientTypeServer:
+			serverObj, err := w.adaptors.Server.GetById(data[0])
+			if err != nil {
+				ctx.AbortWithError(401, errors.New("unauthorized access"))
+				return
+			}
+
+			clientId = serverObj.Id
+			token = serverObj.Token
+
+		case ClientTypeMobile:
+			mobileObj, err := w.adaptors.Mobile.GetById(data[0])
+			if err != nil {
+				ctx.AbortWithError(401, errors.New("unauthorized access"))
+				return
+			}
+
+			clientId = mobileObj.Id
+			token = mobileObj.Token.String()
+		default:
+			ctx.AbortWithError(400, fmt.Errorf("unknown client type %v", clientType))
+			return
+		}
+
+		if hash != common.Sha256(requestRandomId+token+fmt.Sprintf("%d", timestamp)) {
+			ctx.AbortWithError(401, errors.New("unauthorized access"))
+			return
+		}
+
+	} else {
+
+		switch clientType {
+		case ClientTypeServer, ClientTypeMobile:
+		default:
+			ctx.AbortWithError(400, fmt.Errorf("unknown client type %v", clientType))
+			return
+		}
 	}
 
 	// CORS
@@ -67,10 +132,11 @@ func (w *StreamService) Ws(ctx *gin.Context) {
 	}
 
 	client := &Client{
+		Id:      clientId,
 		Connect: conn,
 		Ip:      ctx.ClientIP(),
 		Send:    make(chan []byte),
-		Token:   ctx.Request.Header.Get("X-API-Key"),
+		Token:   token,
 		Type:    clientType,
 	}
 
@@ -78,7 +144,8 @@ func (w *StreamService) Ws(ctx *gin.Context) {
 	w.Hub.AddClient(client)
 }
 
-func (s *StreamService) GetClientByToken(token string) (client *Client, err error) {
-	client, err = s.Hub.GetClientByToken(token)
+func (s *StreamService) GetClientByIdAndType(clientId,
+	clientType string) (client *Client, err error) {
+	client, err = s.Hub.GetClientByIdAndType(clientId, clientType)
 	return
 }

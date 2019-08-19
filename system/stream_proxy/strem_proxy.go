@@ -1,6 +1,7 @@
 package stream_proxy
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/e154/smart-home-gate/adaptors"
@@ -10,13 +11,16 @@ import (
 	m "github.com/e154/smart-home-gate/models"
 	"github.com/e154/smart-home-gate/system/graceful_service"
 	"github.com/e154/smart-home-gate/system/stream"
+	"github.com/e154/smart-home-gate/system/uuid"
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 	"github.com/op/go-logging"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
 	"strings"
+	"time"
 )
 
 var (
@@ -133,7 +137,7 @@ func (s *StreamProxy) auth(ctx *gin.Context) {
 	}
 
 	var serverObj *m.Server
-	if serverObj, err = s.adaptors.Server.GetById(mobileObj.ServerId);err != nil {
+	if serverObj, err = s.adaptors.Server.GetById(mobileObj.ServerId); err != nil {
 		ctx.AbortWithError(401, errors.New("unauthorized access"))
 		return
 	}
@@ -166,10 +170,9 @@ func (s *StreamProxy) controller(ctx *gin.Context) {
 		return
 	}
 
-
 	body, err := ioutil.ReadAll(ctx.Request.Body)
 	if err != nil {
-		log.Error(err.Error())
+		ctx.String(http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -184,12 +187,58 @@ func (s *StreamProxy) controller(ctx *gin.Context) {
 	fmt.Printf("streamRequestModel: %v\n", streamRequestModel)
 
 	var client *stream.Client
-	if client, err = s.streamService.GetClientByToken(serverObj.Token); err != nil {
-		log.Error(err.Error())
+	if client, err = s.streamService.GetClientByIdAndType(serverObj.Id, stream.ClientTypeServer); err != nil {
+		ctx.String(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	client.Send <- response.Pack()
+	if client == nil {
+		ctx.String(http.StatusNotFound, "server not found")
+		return
+	}
+
+	debug.Println(client)
+
+	payload := map[string]interface{}{
+		"request": streamRequestModel,
+	}
+
+	s.Send("mobile_gate_proxy", payload, client, ctx, func(msg stream.Message) {
+		fmt.Println("ok")
+		debug.Println(msg)
+	})
+
+	return
+}
+
+func (g *StreamProxy) Send(command string, payload map[string]interface{}, client *stream.Client, ctx *gin.Context, f func(msg stream.Message)) (err error) {
+
+	done := make(chan struct{})
+
+	message := stream.Message{
+		Id:      uuid.NewV4(),
+		Command: command,
+		Payload: payload,
+	}
+
+	g.streamService.Subscribe(message.Id.String(), func(client *stream.Client, msg stream.Message) {
+		g.streamService.UnSubscribe(message.Id.String())
+		f(msg)
+		done <- struct{}{}
+	})
+
+	msg, _ := json.Marshal(message)
+	if err := client.Write(websocket.TextMessage, msg); err != nil {
+		log.Error(err.Error())
+	}
+
+	select {
+	case <-time.After(2 * time.Second):
+		ctx.AbortWithStatus(http.StatusRequestTimeout)
+	case <-done:
+	case <-ctx.Done():
+		ctx.AbortWithStatus(http.StatusRequestTimeout)
+	}
 
 	return
 }

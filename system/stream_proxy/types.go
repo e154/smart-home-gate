@@ -1,6 +1,8 @@
 package stream_proxy
 
-import "net/http"
+import (
+	"net/http"
+)
 
 type StreamRequestModel struct {
 	URI    string      `json:"uri"`

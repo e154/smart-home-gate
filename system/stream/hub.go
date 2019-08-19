@@ -45,12 +45,12 @@ func (h *Hub) AddClient(client *Client) {
 
 	defer func() {
 		delete(h.sessions, client)
-		log.Infof("websocket session from ip: %s closed", client.Ip)
+		log.Infof("websocket session from ip(%s) closed, id(%s)", client.Ip, client.Id)
 	}()
 
 	h.sessions[client] = true
 
-	log.Infof("new websocket session established, from ip(%s), type(%v)", client.Ip, client.Type)
+	log.Infof("new websocket session established, from ip(%s), type(%v), id(%s)", client.Ip, client.Type, client.Id)
 
 	_ = client.Connect.SetReadDeadline(time.Now().Add(pongWait))
 	client.Connect.SetPongHandler(func(string) error {
@@ -74,18 +74,15 @@ func (h *Hub) AddClient(client *Client) {
 	}
 }
 
-func (h *Hub) GetClientByToken(token string) (client *Client, err error) {
+func (h *Hub) GetClientByIdAndType(clientId, clientType string) (client *Client, err error) {
 
 	for cli, _ := range h.sessions {
-		if cli.Token == token {
+		if cli.Id == clientId && cli.Type == clientType {
 			client = cli
 			return
 		}
 	}
 
-	if client == nil {
-		err = fmt.Errorf("not found")
-	}
 	return
 }
 
@@ -158,6 +155,7 @@ func (h *Hub) Subscribe(command string, f func(client *Client, msg Message)) {
 }
 
 func (h *Hub) UnSubscribe(command string) {
+	log.Infof("unsubscribe %s", command)
 	if h.subscribers[command] != nil {
 		delete(h.subscribers, command)
 	}
