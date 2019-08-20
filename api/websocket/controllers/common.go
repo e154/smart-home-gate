@@ -36,7 +36,7 @@ func (c *ControllerCommon) GetServer(client *stream.Client) (server *m.Server, e
 		return
 	}
 
-	server, err = c.adaptors.Server.GetByAccessToken(client.Token)
+	server, err = c.adaptors.Server.GetById(client.Id)
 
 	return
 }

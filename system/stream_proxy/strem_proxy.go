@@ -192,7 +192,7 @@ func (s *StreamProxy) controller(ctx *gin.Context) {
 		"request": streamRequestModel,
 	}
 
-	s.Send("mobile_gate_proxy", payload, client, ctx, func(msg stream.Message) {
+	err = s.Send("mobile_gate_proxy", payload, client, ctx, func(msg stream.Message) {
 
 		//debug.Println(msg.Payload)
 
@@ -202,7 +202,7 @@ func (s *StreamProxy) controller(ctx *gin.Context) {
 		}
 
 		r := &StreamResponseModel{}
-		common.Copy(&r, msg.Payload["response"], common.JsonEngine)
+		_ = common.Copy(&r, msg.Payload["response"], common.JsonEngine)
 
 		//fmt.Println(string(r.Body))
 
@@ -212,6 +212,10 @@ func (s *StreamProxy) controller(ctx *gin.Context) {
 
 		ctx.Render(r.Code, render.Data{Data: r.Body, ContentType: "application/json; charset=utf-8"})
 	})
+
+	if err != nil {
+		ctx.AbortWithStatus(http.StatusInternalServerError)
+	}
 
 	return
 }

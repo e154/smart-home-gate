@@ -1,7 +1,6 @@
 package stream
 
 import (
-	"fmt"
 	"github.com/gorilla/websocket"
 	"io/ioutil"
 	"os"
@@ -107,7 +106,7 @@ func (h *Hub) Run() {
 
 func (h *Hub) Recv(client *Client, b []byte) {
 
-	fmt.Printf("client(%v), message(%v)\n", client, string(b))
+	//fmt.Printf("client(%v), message(%v)\n", client, string(b))
 
 	msg, err := NewMessage(b)
 	if err != nil {

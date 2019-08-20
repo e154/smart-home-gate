@@ -90,6 +90,8 @@ func (n *Server) GetByToken(token string) (ver *m.Server, err error) {
 
 func (n *Server) GetByAccessToken(accessToken string) (ver *m.Server, err error) {
 
+	//log.Debugf("accessToken %s", accessToken)
+
 	data := strings.Split(accessToken, "-")
 	if len(data) != 4 {
 		err = fmt.Errorf("access token not valid")
