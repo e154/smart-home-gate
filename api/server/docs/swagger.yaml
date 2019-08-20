@@ -1,6 +1,1817 @@
 basePath: /
 consumes:
 - application/json
+definitions:
+  AccountType:
+    description: AccountType Тип аккаунта
+    type: string
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  AddressModel:
+    description: AddressModel географические адреса
+    properties:
+      address_line_1:
+        description: Адрес №1 (сша)
+        type: string
+        x-go-name: AddressLine1
+      address_line_2:
+        description: Адрес №2 (сша)
+        type: string
+        x-go-name: AddressLine2
+      area:
+        description: Район
+        type: string
+        x-go-name: Area
+      building:
+        description: Корпус
+        type: string
+        x-go-name: Building
+      city:
+        description: Город
+        type: string
+        x-go-name: City
+      country:
+        description: Страна
+        type: string
+        x-go-name: Country
+      flat:
+        description: Квартира
+        type: string
+        x-go-name: Flat
+      house:
+        description: Дом
+        type: string
+        x-go-name: House
+      street:
+        description: Улица
+        type: string
+        x-go-name: Street
+      zip:
+        description: Почтовый индекс
+        type: string
+        x-go-name: Zip
+    type: object
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  AuthInfoModel:
+    description: AuthInfoModel Информация о сессии
+    properties:
+      access_token:
+        description: access token
+        type: string
+        x-go-name: AccessToken
+      access_token_expire:
+        description: access token expire
+        format: date-time
+        type: string
+        x-go-name: AccessTokenExpire
+      authorized_real:
+        description: Флаг авторизации на базовом сервере
+        type: boolean
+        x-go-name: AuthorizedReal
+      refresh_token:
+        description: refresh token
+        type: string
+        x-go-name: RefreshToken
+    required:
+    - access_token
+    - access_token_expire
+    - refresh_token
+    type: object
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  AvailablePaymentsModel:
+    description: AvailablePaymentsModel Доступные методы ввода/вывода средств
+    properties:
+      max:
+        $ref: '#/definitions/CurrencyValue'
+      min:
+        $ref: '#/definitions/CurrencyValue'
+      payment_methods:
+        $ref: '#/definitions/availablePaymentsModelPaymentMethods'
+      payout_methods:
+        $ref: '#/definitions/availablePaymentsModelPayoutMethods'
+    type: object
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  BalanceModel:
+    description: BalanceModel Баланс пользователя
+    properties:
+      blocked_total:
+        description: сумма поручительств
+        format: double
+        type: number
+        x-go-name: BlockedTotal
+      currency_code:
+        $ref: '#/definitions/CurrencyCode'
+      income_total:
+        description: всего заработанно
+        format: double
+        type: number
+        x-go-name: IncomeTotal
+      losses_total:
+        description: всего потеряно
+        format: double
+        type: number
+        x-go-name: LossesTotal
+      payout_prom:
+        description: ожидают вывода
+        format: double
+        type: number
+        x-go-name: PayoutProm
+      promise_reward:
+        description: ожидаемое вознаграждение
+        format: double
+        type: number
+        x-go-name: PromiseReward
+      promo:
+        description: по промокоду (не вывезти)
+        format: double
+        type: number
+        x-go-name: Promo
+      surety_model:
+        $ref: '#/definitions/BalanceSuretyModel'
+      total:
+        description: всего средств
+        format: double
+        type: number
+        x-go-name: Total
+      total_available:
+        description: свободные средства
+        format: double
+        type: number
+        x-go-name: TotalAvailable
+    type: object
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  BalanceSuretyModel:
+    description: BalanceSuretyModel шаг поручительства
+    properties:
+      default:
+        description: сумма поумолчанию
+        format: double
+        type: number
+        x-go-name: Default
+      max:
+        description: максимальная сумма
+        format: double
+        type: number
+        x-go-name: Max
+      min:
+        description: минимальная сумма
+        format: double
+        type: number
+        x-go-name: Min
+      step:
+        description: шаг поручительства
+        format: double
+        type: number
+        x-go-name: Step
+    type: object
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  BirthModel:
+    description: BirthModel модель даты рождения
+    properties:
+      date:
+        description: дата рождения ДД.ММ.ГГГГ
+        type: string
+        x-go-name: Date
+      place:
+        description: место
+        type: string
+        x-go-name: Place
+    type: object
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  BorrowerModel:
+    description: BorrowerModel модель заемщика
+    properties:
+      birth:
+        $ref: '#/definitions/borrowerModelBirth'
+      city:
+        description: Город заемщика
+        type: string
+        x-go-name: City
+      gender:
+        description: пол заемщика 0 - female, 1 - male
+        type: string
+        x-go-name: Gender
+      name:
+        $ref: '#/definitions/NameModel'
+      photo_url:
+        description: урл на фото заемщика
+        type: string
+        x-go-name: PhotoURL
+      resource:
+        $ref: '#/definitions/ResourceModel'
+    type: object
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  CurrencyCode:
+    description: CurrencyCode Валюта
+    type: string
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  CurrencyValue:
+    description: CurrencyValue значение с признаком валюты
+    properties:
+      currency_code:
+        description: валюта
+        type: string
+        x-go-name: CurrencyCode
+      value:
+        description: значение
+        format: double
+        type: number
+        x-go-name: Value
+    type: object
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  ErrorModel:
+    description: ErrorModel error model
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      errors:
+        $ref: '#/definitions/errorModelErrors'
+      message:
+        description: описание ошибки
+        type: string
+        x-go-name: Message
+    type: object
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  IdentityDocumentIdKz:
+    description: IdentityDocumentIDKz identity document Id kz
+    properties:
+      expire_date:
+        description: Дата оканчания
+        type: string
+        x-go-name: ExpireDate
+      iin:
+        description: ИИН
+        type: string
+        x-go-name: Iin
+      issue_date:
+        description: Дата выдачи
+        type: string
+        x-go-name: IssueDate
+      issue_place:
+        description: Место выдачи
+        type: string
+        x-go-name: IssuePlace
+      number:
+        description: Номер
+        type: string
+        x-go-name: Number
+    type: object
+    x-go-name: IdentityDocumentIDKz
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  IdentityDocumentIdMx:
+    description: IdentityDocumentIDMx identity document Id mx
+    properties:
+      ssn:
+        description: Social security number
+        type: string
+        x-go-name: Ssn
+    type: object
+    x-go-name: IdentityDocumentIDMx
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  IdentityDocumentIdUs:
+    description: IdentityDocumentIDUs identity document Id us
+    properties:
+      ssn:
+        description: Social security number
+        type: string
+        x-go-name: Ssn
+    type: object
+    x-go-name: IdentityDocumentIDUs
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  IdentityDocumentResourceModel:
+    description: IdentityDocumentResourceModel Скан окумента
+    properties:
+      id:
+        description: id
+        format: int64
+        type: integer
+        x-go-name: ID
+      loaded:
+        description: флаг загрузки
+        type: boolean
+        x-go-name: Loaded
+      loaded_at:
+        description: дата время загрузки
+        format: date-time
+        type: string
+        x-go-name: LoadedAt
+      system_name:
+        description: системное наименование документа
+        type: string
+        x-go-name: SystemName
+    type: object
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  IdentityDocumentResourcesModel:
+    description: IdentityDocumentResourcesModel Перечень документов подлежащих отправки
+      в suretly
+    items:
+      $ref: '#/definitions/IdentityDocumentResourceModel'
+    type: array
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  IdentityDocumentType:
+    description: IdentityDocumentType Тип документа удостоверяющего личность
+    type: string
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  IdentityDocumentUserPassportRf:
+    description: IdentityDocumentUserPassportRf identity document user passport rf
+    properties:
+      issue_code:
+        description: Код подразделения
+        type: string
+        x-go-name: IssueCode
+      issue_date:
+        description: Дата выдачи
+        type: string
+        x-go-name: IssueDate
+      issue_place:
+        description: Место выдачи
+        type: string
+        x-go-name: IssuePlace
+      number:
+        description: Номер
+        type: string
+        x-go-name: Number
+      registration:
+        description: Место регистрации
+        type: string
+        x-go-name: Registration
+      series:
+        description: Серия
+        type: string
+        x-go-name: Series
+    type: object
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  NameModel:
+    description: NameModel модель фио
+    properties:
+      first:
+        description: имя
+        type: string
+        x-go-name: First
+      last:
+        description: фамилия
+        type: string
+        x-go-name: Last
+      maiden:
+        description: девичье имя
+        type: string
+        x-go-name: Maiden
+      middle:
+        description: отчество
+        type: string
+        x-go-name: Middle
+    type: object
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  OrderDetail:
+    description: OrderDetail детали заявки
+    properties:
+      income:
+        $ref: '#/definitions/CurrencyValue'
+      issued_date:
+        description: дата выдачи
+        format: date-time
+        type: string
+        x-go-name: IssuedDate
+      losses:
+        $ref: '#/definitions/CurrencyValue'
+      plain_dates:
+        description: дата возврата
+        items:
+          format: date-time
+          type: string
+        type: array
+        x-go-name: PlainDates
+      return_amount:
+        $ref: '#/definitions/CurrencyValue'
+      return_date:
+        description: дата возврата
+        format: date-time
+        type: string
+        x-go-name: ReturnDate
+      status:
+        $ref: '#/definitions/OrderStatus'
+    type: object
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  OrderEventNotificationModel:
+    description: OrderEventNotificationModel элемент события заявки
+    properties:
+      borrower:
+        $ref: '#/definitions/BorrowerModel'
+      delta_amount:
+        $ref: '#/definitions/CurrencyValue'
+      event_type:
+        $ref: '#/definitions/OrderEventType'
+      order_due_time:
+        description: order due time
+        format: date-time
+        type: string
+        x-go-name: OrderDueTime
+      order_id:
+        description: order id
+        type: string
+        x-go-name: OrderID
+      risk_rating:
+        $ref: '#/definitions/RiskRating'
+      time_stamp:
+        description: время события
+        format: date-time
+        type: string
+        x-go-name: TimeStamp
+      total_available:
+        $ref: '#/definitions/CurrencyValue'
+    type: object
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  OrderEventType:
+    description: OrderEventType Тип уведомления
+    type: string
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  OrderModel:
+    description: OrderModel модель заявки на займ
+    properties:
+      bid:
+        $ref: '#/definitions/CurrencyValue'
+      bids_count:
+        description: всего поручительств на данный момент
+        format: int64
+        type: integer
+        x-go-name: BidsCount
+      bids_sum:
+        description: сумма поручительств на данный момент
+        format: double
+        type: number
+        x-go-name: BidsSum
+      borrower:
+        $ref: '#/definitions/BorrowerModel'
+      country:
+        description: системное наименование страны
+        type: string
+        x-go-name: Country
+      country_code:
+        description: код страны
+        type: string
+        x-go-name: CountryCode
+      created_at:
+        description: created at
+        format: date-time
+        type: string
+        x-go-name: CreatedAt
+      currency_code:
+        $ref: '#/definitions/CurrencyCode'
+      detail:
+        $ref: '#/definitions/OrderDetail'
+      due_time:
+        description: время окончания поиска
+        format: date-time
+        type: string
+        x-go-name: DueTime
+      id:
+        description: иденификатор ордера в базе
+        type: string
+        x-go-name: ID
+      loan_sum:
+        description: сумма займа
+        format: double
+        type: number
+        x-go-name: LoanSum
+      loan_term:
+        description: срок займа в днях
+        format: int64
+        type: integer
+        x-go-name: LoanTerm
+      profit_percent:
+        description: процент вознаграждения
+        format: double
+        type: number
+        x-go-name: ProfitPercent
+      progress:
+        $ref: '#/definitions/OrderProgressModel'
+      return_percent:
+        description: процент возврата
+        format: double
+        type: number
+        x-go-name: ReturnPercent
+      risk_group:
+        $ref: '#/definitions/RiskGroup'
+    type: object
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  OrderProgressModel:
+    description: OrderProgressModel прогресс заполнения заявки
+    properties:
+      bids_count:
+        description: всего поручительств на данный момент
+        format: int64
+        type: integer
+        x-go-name: BidsCount
+      bids_sum:
+        $ref: '#/definitions/CurrencyValue'
+      id:
+        description: иденификатор ордера в базе
+        type: string
+        x-go-name: ID
+      loan_sum:
+        $ref: '#/definitions/CurrencyValue'
+      status:
+        $ref: '#/definitions/OrderStatus'
+    type: object
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  OrderStatus:
+    description: OrderStatus Состояние завки
+    type: string
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  OrderSuretyModel:
+    description: OrderSuretyModel order surety model
+    properties:
+      avatar_url:
+        description: avatar url
+        type: string
+        x-go-name: AvatarURL
+      commission:
+        $ref: '#/definitions/CurrencyValue'
+      detail:
+        $ref: '#/definitions/OrderDetail'
+      due_time:
+        description: дата возврата, или
+        format: date-time
+        type: string
+        x-go-name: DueTime
+      more_info:
+        description: что-то еще
+        type: object
+        x-go-name: MoreInfo
+      order_id:
+        description: order id
+        type: string
+        x-go-name: OrderID
+      risk_group:
+        $ref: '#/definitions/RiskGroup'
+      risk_percent:
+        description: risk percent
+        format: double
+        type: number
+        x-go-name: RiskPercent
+      status:
+        $ref: '#/definitions/OrderStatus'
+    type: object
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  PaymentModel:
+    description: PaymentModel Метод ввода/вывода средств
+    properties:
+      color:
+        description: color
+        type: string
+        x-go-name: Color
+      commission:
+        description: commission
+        format: double
+        type: number
+        x-go-name: Commission
+      image_url:
+        description: image url
+        type: string
+        x-go-name: ImageURL
+      system_name:
+        $ref: '#/definitions/PaymentNameType'
+      type:
+        $ref: '#/definitions/PaymentType'
+    type: object
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  PaymentNameType:
+    description: PaymentNameType Тип операции
+    type: string
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  PaymentType:
+    description: PaymentType Тип операции
+    type: string
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  Permissions:
+    description: Permissions Список прав доступа
+    items:
+      type: string
+    type: array
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  ResourceModel:
+    description: ResourceModel Объект со списком связанных изображений
+    properties:
+      contentType:
+        description: content type
+        type: string
+        x-go-name: ContentType
+      format_urls:
+        description: format urls
+        items:
+          additionalProperties:
+            type: string
+          type: object
+        type: array
+        x-go-name: FormatUrls
+      original:
+        description: ссылка на оригинальное изображение
+        type: string
+        x-go-name: Original
+      resourceId:
+        description: id ресурса
+        format: int64
+        type: integer
+        x-go-name: ResourceID
+    type: object
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  ResponseType:
+    description: ResponseType Тип ответов
+    type: string
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  RiskGroup:
+    description: RiskGroup группа риска
+    type: string
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  RiskRating:
+    description: RiskRating risk rating
+    properties:
+      percent:
+        description: percent
+        format: double
+        type: number
+        x-go-name: Percent
+      risk_group:
+        $ref: '#/definitions/RiskGroup'
+    type: object
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  SessionInfoModel:
+    description: SessionInfoModel Информация о текущей сессии
+    properties:
+      account_info:
+        $ref: '#/definitions/sessionInfoModelAccountInfo'
+      auth_info:
+        $ref: '#/definitions/AuthInfoModel'
+      user_info:
+        $ref: '#/definitions/UserInfoModel'
+      user_settings:
+        $ref: '#/definitions/UserSettingsModel'
+    type: object
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  SettingsModel:
+    description: SettingsModel settings model
+    properties:
+      available_payments:
+        $ref: '#/definitions/AvailablePaymentsModel'
+      surety_models:
+        $ref: '#/definitions/SuretyModels'
+    type: object
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  SuretyModel:
+    description: SuretyModel шаг поручительства
+    properties:
+      currency_code:
+        $ref: '#/definitions/CurrencyCode'
+      default:
+        description: сумма поумолчанию
+        format: double
+        type: number
+        x-go-name: Default
+      max:
+        description: максимальная сумма
+        format: double
+        type: number
+        x-go-name: Max
+      min:
+        description: минимальная сумма
+        format: double
+        type: number
+        x-go-name: Min
+      step:
+        description: шаг поручительства
+        format: double
+        type: number
+        x-go-name: Step
+    type: object
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  SuretyModels:
+    additionalProperties:
+      $ref: '#/definitions/SuretyModel'
+    description: SuretyModels surety models
+    type: object
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  UserCardDetailModel:
+    description: UserCardDetailModel географические адреса (не закончен)
+    type: object
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  UserInfoModel:
+    description: UserInfoModel Информация о пользователе
+    properties:
+      account_type:
+        $ref: '#/definitions/AccountType'
+      display_name:
+        description: display name
+        type: string
+        x-go-name: DisplayName
+      is_new:
+        description: если аккаунт только что создан
+        type: boolean
+        x-go-name: IsNew
+      permissions:
+        $ref: '#/definitions/Permissions'
+      user_id:
+        description: user id
+        type: string
+        x-go-name: UserID
+    required:
+    - account_type
+    - display_name
+    - is_new
+    - permissions
+    - user_id
+    type: object
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  UserSettingsModel:
+    description: UserSettingsModel Информация о пользователе
+    properties:
+      country_agreements:
+        additionalProperties:
+          type: boolean
+        description: country agreements
+        type: object
+        x-go-name: CountryAgreements
+    type: object
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  accountCardBindingOKBody:
+    description: AccountCardBindingOKBody account card binding o k body
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      data:
+        $ref: '#/definitions/accountCardBindingOKBodyData'
+    type: object
+    x-go-name: AccountCardBindingOKBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  accountCardBindingOKBodyData:
+    description: AccountCardBindingOKBodyData account card binding o k body data
+    properties:
+      uri:
+        description: ссылка на страницу ввода данных
+        type: string
+        x-go-name: URI
+    type: object
+    x-go-name: AccountCardBindingOKBodyData
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  accountCardUnbindOKBody:
+    description: AccountCardUnbindOKBody account card unbind o k body
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      data:
+        description: data
+        type: object
+        x-go-name: Data
+    type: object
+    x-go-name: AccountCardUnbindOKBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  accountCardUnbindParamsBody:
+    description: AccountCardUnbindParamsBody account card unbind params body
+    properties:
+      card_id:
+        description: card id
+        format: int64
+        type: integer
+        x-go-name: CardID
+    type: object
+    x-go-name: AccountCardUnbindParamsBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  accountPayInOKBody:
+    description: AccountPayInOKBody account pay in o k body
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      data:
+        $ref: '#/definitions/accountPayInOKBodyData'
+    type: object
+    x-go-name: AccountPayInOKBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  accountPayInOKBodyData:
+    description: AccountPayInOKBodyData account pay in o k body data
+    properties:
+      uri:
+        description: ссылка на страницу ввода данных
+        type: string
+        x-go-name: URI
+    type: object
+    x-go-name: AccountPayInOKBodyData
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  accountPayInParamsBody:
+    description: AccountPayInParamsBody account pay in params body
+    properties:
+      sum:
+        description: количество средств на ввод
+        format: double
+        type: number
+        x-go-name: Sum
+      system_name:
+        $ref: '#/definitions/PaymentNameType'
+    type: object
+    x-go-name: AccountPayInParamsBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  accountPayOutOKBody:
+    description: AccountPayOutOKBody account pay out o k body
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      data:
+        $ref: '#/definitions/BalanceModel'
+    type: object
+    x-go-name: AccountPayOutOKBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  accountPayOutParamsBody:
+    description: AccountPayOutParamsBody account pay out params body
+    properties:
+      card_id:
+        description: номер привязанной карты
+        format: int64
+        type: integer
+        x-go-name: CardID
+      sum:
+        description: количество средств на вывод
+        format: double
+        type: number
+        x-go-name: Sum
+      system_name:
+        $ref: '#/definitions/PaymentNameType'
+    type: object
+    x-go-name: AccountPayOutParamsBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  authDeleteAllTokensOKBody:
+    description: AuthDeleteAllTokensOKBody auth delete all tokens o k body
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      data:
+        description: data
+        type: object
+        x-go-name: Data
+    type: object
+    x-go-name: AuthDeleteAllTokensOKBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  authDeleteTokenOKBody:
+    description: AuthDeleteTokenOKBody auth delete token o k body
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      data:
+        description: data
+        type: object
+        x-go-name: Data
+    type: object
+    x-go-name: AuthDeleteTokenOKBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  authDemoOKBody:
+    description: AuthDemoOKBody auth demo o k body
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      data:
+        $ref: '#/definitions/SessionInfoModel'
+    type: object
+    x-go-name: AuthDemoOKBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  authDemoParamsBody:
+    description: AuthDemoParamsBody auth demo params body
+    properties:
+      country:
+        description: страна
+        type: string
+        x-go-name: Country
+      device_id:
+        description: уникальный id устройства
+        type: string
+        x-go-name: DeviceID
+    required:
+    - country
+    type: object
+    x-go-name: AuthDemoParamsBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  authUpdateTokenOKBody:
+    description: AuthUpdateTokenOKBody auth update token o k body
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      data:
+        description: data
+        type: object
+        x-go-name: Data
+    type: object
+    x-go-name: AuthUpdateTokenOKBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  authUpdateTokenParamsBody:
+    description: AuthUpdateTokenParamsBody auth update token params body
+    properties:
+      refresh_token:
+        description: электронный адрес
+        type: string
+        x-go-name: RefreshToken
+    required:
+    - refresh_token
+    type: object
+    x-go-name: AuthUpdateTokenParamsBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  availablePaymentsModelPaymentMethods:
+    description: AvailablePaymentsModelPaymentMethods available payments model payment
+      methods
+    items:
+      $ref: '#/definitions/PaymentModel'
+    type: array
+    x-go-name: AvailablePaymentsModelPaymentMethods
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  availablePaymentsModelPayoutMethods:
+    description: AvailablePaymentsModelPayoutMethods available payments model payout
+      methods
+    items:
+      $ref: '#/definitions/PaymentModel'
+    type: array
+    x-go-name: AvailablePaymentsModelPayoutMethods
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  borrowerModelBirth:
+    description: BorrowerModelBirth модель даты рождения
+    properties:
+      date:
+        description: дата рождения
+        format: date
+        type: string
+        x-go-name: Date
+      place:
+        description: место
+        type: string
+        x-go-name: Place
+    type: object
+    x-go-name: BorrowerModelBirth
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  deleteIdentityDocumentDeleteResourceOKBody:
+    description: DeleteIdentityDocumentDeleteResourceOKBody delete identity document
+      delete resource o k body
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      data:
+        description: data
+        type: object
+        x-go-name: Data
+    type: object
+    x-go-name: DeleteIdentityDocumentDeleteResourceOKBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  deleteIdentityDocumentDeleteResourceParamsBody:
+    description: DeleteIdentityDocumentDeleteResourceParamsBody delete identity document
+      delete resource params body
+    properties:
+      resource_id:
+        description: id ресурса
+        format: int64
+        type: integer
+        x-go-name: ResourceID
+    type: object
+    x-go-name: DeleteIdentityDocumentDeleteResourceParamsBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  errorModelErrors:
+    description: ErrorModelErrors error model errors
+    items:
+      $ref: '#/definitions/errorModelErrorsItems'
+    type: array
+    x-go-name: ErrorModelErrors
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  errorModelErrorsItems:
+    description: ErrorModelErrorsItems error model errors items
+    properties:
+      code:
+        description: тип ишибки
+        type: string
+        x-go-name: Code
+      field:
+        description: поле вызвавшее ошибку
+        type: string
+        x-go-name: Field
+      message:
+        description: описание
+        type: string
+        x-go-name: Message
+    type: object
+    x-go-name: ErrorModelErrorsItems
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  getAccountBalanceOKBody:
+    description: GetAccountBalanceOKBody get account balance o k body
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      data:
+        $ref: '#/definitions/BalanceModel'
+    type: object
+    x-go-name: GetAccountBalanceOKBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  getAccountCardListOKBody:
+    description: GetAccountCardListOKBody get account card list o k body
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      data:
+        $ref: '#/definitions/getAccountCardListOKBodyData'
+    type: object
+    x-go-name: GetAccountCardListOKBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  getAccountCardListOKBodyData:
+    description: GetAccountCardListOKBodyData get account card list o k body data
+    items:
+      $ref: '#/definitions/getAccountCardListOKBodyDataItems'
+    type: array
+    x-go-name: GetAccountCardListOKBodyData
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  getAccountCardListOKBodyDataItems:
+    description: GetAccountCardListOKBodyDataItems get account card list o k body
+      data items
+    properties:
+      card_id:
+        description: номер карты в системе
+        format: double
+        type: number
+        x-go-name: CardID
+      masked_pan:
+        description: хэшированный номер карты
+        type: string
+        x-go-name: MaskedPan
+    type: object
+    x-go-name: GetAccountCardListOKBodyDataItems
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  getAccountProfitOKBody:
+    description: GetAccountProfitOKBody get account profit o k body
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      data:
+        $ref: '#/definitions/getAccountProfitOKBodyData'
+    type: object
+    x-go-name: GetAccountProfitOKBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  getAccountProfitOKBodyData:
+    description: GetAccountProfitOKBodyData get account profit o k body data
+    properties:
+      losses:
+        $ref: '#/definitions/CurrencyValue'
+      profit:
+        $ref: '#/definitions/CurrencyValue'
+    type: object
+    x-go-name: GetAccountProfitOKBodyData
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  getNotificationListOKBody:
+    description: GetNotificationListOKBody get notification list o k body
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      data:
+        $ref: '#/definitions/getNotificationListOKBodyData'
+    type: object
+    x-go-name: GetNotificationListOKBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  getNotificationListOKBodyData:
+    description: GetNotificationListOKBodyData get notification list o k body data
+    properties:
+      balance:
+        $ref: '#/definitions/BalanceModel'
+      notifications:
+        $ref: '#/definitions/getNotificationListOKBodyDataNotifications'
+    type: object
+    x-go-name: GetNotificationListOKBodyData
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  getNotificationListOKBodyDataNotifications:
+    description: GetNotificationListOKBodyDataNotifications get notification list
+      o k body data notifications
+    items:
+      $ref: '#/definitions/OrderEventNotificationModel'
+    type: array
+    x-go-name: GetNotificationListOKBodyDataNotifications
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  getOpenOrderListOKBody:
+    description: GetOpenOrderListOKBody get open order list o k body
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      data:
+        $ref: '#/definitions/getOpenOrderListOKBodyData'
+    type: object
+    x-go-name: GetOpenOrderListOKBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  getOpenOrderListOKBodyData:
+    description: GetOpenOrderListOKBodyData get open order list o k body data
+    properties:
+      cursor:
+        description: order id с которого начинаем пагинацию
+        type: string
+        x-go-name: Cursor
+      items:
+        $ref: '#/definitions/getOpenOrderListOKBodyDataItems'
+      limit:
+        description: количество элементов
+        format: int64
+        type: integer
+        x-go-name: Limit
+    type: object
+    x-go-name: GetOpenOrderListOKBodyData
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  getOpenOrderListOKBodyDataItems:
+    description: GetOpenOrderListOKBodyDataItems список открытых заявок
+    items:
+      $ref: '#/definitions/OrderModel'
+    type: array
+    x-go-name: GetOpenOrderListOKBodyDataItems
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  getOrderByIdOKBody:
+    description: GetOrderByIDOKBody get order by Id o k body
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      data:
+        $ref: '#/definitions/OrderModel'
+    type: object
+    x-go-name: GetOrderByIDOKBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  getOrderProgressOKBody:
+    description: GetOrderProgressOKBody get order progress o k body
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      data:
+        $ref: '#/definitions/getOrderProgressOKBodyData'
+    type: object
+    x-go-name: GetOrderProgressOKBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  getOrderProgressOKBodyData:
+    description: GetOrderProgressOKBodyData get order progress o k body data
+    properties:
+      bids_count:
+        description: всего поручительств на данный момент
+        format: int64
+        type: integer
+        x-go-name: BidsCount
+      bids_sum:
+        $ref: '#/definitions/CurrencyValue'
+      id:
+        description: иденификатор ордера в базе
+        type: string
+        x-go-name: ID
+      loan_sum:
+        $ref: '#/definitions/CurrencyValue'
+      status:
+        description: статус заявки
+        type: string
+        x-go-name: Status
+    type: object
+    x-go-name: GetOrderProgressOKBodyData
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  getOrderSuretyListOKBody:
+    description: GetOrderSuretyListOKBody get order surety list o k body
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      data:
+        $ref: '#/definitions/getOrderSuretyListOKBodyData'
+    type: object
+    x-go-name: GetOrderSuretyListOKBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  getOrderSuretyListOKBodyData:
+    description: GetOrderSuretyListOKBodyData get order surety list o k body data
+    properties:
+      cursor:
+        description: cursor
+        type: string
+        x-go-name: Cursor
+      filter:
+        description: filter
+        type: string
+        x-go-name: Filter
+      items:
+        $ref: '#/definitions/getOrderSuretyListOKBodyDataItems'
+      limit:
+        description: limit
+        format: int64
+        type: integer
+        x-go-name: Limit
+      next:
+        description: next
+        type: string
+        x-go-name: Next
+      prev:
+        description: prev
+        type: string
+        x-go-name: Prev
+    type: object
+    x-go-name: GetOrderSuretyListOKBodyData
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  getOrderSuretyListOKBodyDataItems:
+    description: GetOrderSuretyListOKBodyDataItems get order surety list o k body
+      data items
+    items:
+      $ref: '#/definitions/OrderSuretyModel'
+    type: array
+    x-go-name: GetOrderSuretyListOKBodyDataItems
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  getSettingsListOKBody:
+    description: GetSettingsListOKBody get settings list o k body
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      data:
+        $ref: '#/definitions/SettingsModel'
+    type: object
+    x-go-name: GetSettingsListOKBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  getSuretyContractOKBody:
+    description: GetSuretyContractOKBody get surety contract o k body
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      data:
+        $ref: '#/definitions/getSuretyContractOKBodyData'
+    type: object
+    x-go-name: GetSuretyContractOKBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  getSuretyContractOKBodyData:
+    description: GetSuretyContractOKBodyData get surety contract o k body data
+    properties:
+      uri:
+        description: ссылка на документ
+        type: string
+        x-go-name: URI
+    type: object
+    x-go-name: GetSuretyContractOKBodyData
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  getUserAccountChangeOKBody:
+    description: GetUserAccountChangeOKBody get user account change o k body
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      data:
+        $ref: '#/definitions/SessionInfoModel'
+    type: object
+    x-go-name: GetUserAccountChangeOKBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  getUserAgreementContractOKBody:
+    description: GetUserAgreementContractOKBody get user agreement contract o k body
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      data:
+        $ref: '#/definitions/getUserAgreementContractOKBodyData'
+    type: object
+    x-go-name: GetUserAgreementContractOKBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  getUserAgreementContractOKBodyData:
+    description: GetUserAgreementContractOKBodyData get user agreement contract o
+      k body data
+    properties:
+      uri:
+        description: ссылка на документ
+        type: string
+        x-go-name: URI
+    type: object
+    x-go-name: GetUserAgreementContractOKBodyData
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  getUserProfileOKBody:
+    description: GetUserProfileOKBody get user profile o k body
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      data:
+        $ref: '#/definitions/getUserProfileOKBodyData'
+    type: object
+    x-go-name: GetUserProfileOKBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  getUserProfileOKBodyData:
+    description: GetUserProfileOKBodyData get user profile o k body data
+    properties:
+      avatar:
+        description: аватар пользователя
+        type: string
+        x-go-name: Avatar
+      birth:
+        $ref: '#/definitions/BirthModel'
+      email:
+        description: почтовый ящик поручителя
+        format: email
+        type: string
+        x-go-name: Email
+      identity_document:
+        $ref: '#/definitions/getUserProfileOKBodyDataIdentityDocument'
+      identity_document_resources:
+        $ref: '#/definitions/IdentityDocumentResourcesModel'
+      identity_document_type:
+        $ref: '#/definitions/IdentityDocumentType'
+      name:
+        $ref: '#/definitions/NameModel'
+    type: object
+    x-go-name: GetUserProfileOKBodyData
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  getUserProfileOKBodyDataIdentityDocument:
+    description: GetUserProfileOKBodyDataIdentityDocument get user profile o k body
+      data identity document
+    properties:
+      expire_date:
+        description: Дата оканчания
+        type: string
+        x-go-name: ExpireDate
+      iin:
+        description: ИИН
+        type: string
+        x-go-name: Iin
+      issue_code:
+        description: Код подразделения
+        type: string
+        x-go-name: IssueCode
+      issue_date:
+        description: Дата выдачи
+        type: string
+        x-go-name: IssueDate
+      issue_place:
+        description: Место выдачи
+        type: string
+        x-go-name: IssuePlace
+      number:
+        description: Номер
+        type: string
+        x-go-name: Number
+      registration:
+        description: Место регистрации
+        type: string
+        x-go-name: Registration
+      series:
+        description: Серия
+        type: string
+        x-go-name: Series
+      ssn:
+        description: Social security number
+        type: string
+        x-go-name: Ssn
+    type: object
+    x-go-name: GetUserProfileOKBodyDataIdentityDocument
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  getUserSessionOKBody:
+    description: GetUserSessionOKBody get user session o k body
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      data:
+        $ref: '#/definitions/SessionInfoModel'
+    type: object
+    x-go-name: GetUserSessionOKBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  orderCommitOKBody:
+    description: OrderCommitOKBody order commit o k body
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      data:
+        $ref: '#/definitions/orderCommitOKBodyData'
+    type: object
+    x-go-name: OrderCommitOKBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  orderCommitOKBodyData:
+    description: OrderCommitOKBodyData order commit o k body data
+    properties:
+      balance:
+        $ref: '#/definitions/BalanceModel'
+      profit_result:
+        description: Сумма вознаграждения за поручение
+        format: double
+        type: number
+        x-go-name: ProfitResult
+    type: object
+    x-go-name: OrderCommitOKBodyData
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  orderCommitParamsBody:
+    description: OrderCommitParamsBody order commit params body
+    properties:
+      id:
+        description: id заявки
+        type: string
+        x-go-name: ID
+      sum:
+        description: сумма займа
+        format: double
+        type: number
+        x-go-name: Sum
+    required:
+    - id
+    - sum
+    type: object
+    x-go-name: OrderCommitParamsBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  orderRejectOKBody:
+    description: OrderRejectOKBody order reject o k body
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      data:
+        description: data
+        type: object
+        x-go-name: Data
+    type: object
+    x-go-name: OrderRejectOKBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  orderRejectParamsBody:
+    description: OrderRejectParamsBody order reject params body
+    properties:
+      id:
+        description: id заявки
+        type: string
+        x-go-name: ID
+    required:
+    - id
+    type: object
+    x-go-name: OrderRejectParamsBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  postAuthConfirmOKBody:
+    description: PostAuthConfirmOKBody post auth confirm o k body
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      data:
+        $ref: '#/definitions/SessionInfoModel'
+    type: object
+    x-go-name: PostAuthConfirmOKBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  postAuthConfirmParamsBody:
+    description: PostAuthConfirmParamsBody post auth confirm params body
+    properties:
+      code:
+        description: проверочный код из смс
+        type: string
+        x-go-name: Code
+      device_id:
+        description: id устройства
+        type: string
+        x-go-name: DeviceID
+      phone:
+        description: телефонный номер пользователя
+        type: string
+        x-go-name: Phone
+    required:
+    - code
+    - phone
+    type: object
+    x-go-name: PostAuthConfirmParamsBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  postAuthTokenOKBody:
+    description: PostAuthTokenOKBody post auth token o k body
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      data:
+        $ref: '#/definitions/postAuthTokenOKBodyData'
+    type: object
+    x-go-name: PostAuthTokenOKBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  postAuthTokenOKBodyData:
+    description: PostAuthTokenOKBodyData post auth token o k body data
+    properties:
+      timeout:
+        description: интервал между запросами подтверждения в секундах
+        format: int32
+        type: integer
+        x-go-name: Timeout
+    type: object
+    x-go-name: PostAuthTokenOKBodyData
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  postAuthTokenParamsBody:
+    description: PostAuthTokenParamsBody post auth token params body
+    properties:
+      country:
+        description: страна
+        type: string
+        x-go-name: Country
+      meta:
+        $ref: '#/definitions/postAuthTokenParamsBodyMeta'
+      phone:
+        description: номер телефона
+        type: string
+        x-go-name: Phone
+    required:
+    - country
+    - phone
+    type: object
+    x-go-name: PostAuthTokenParamsBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  postAuthTokenParamsBodyMeta:
+    description: PostAuthTokenParamsBodyMeta post auth token params body meta
+    properties:
+      client_id:
+        description: uuid клиента
+        type: string
+        x-go-name: ClientID
+      device:
+        description: device
+        type: string
+        x-go-name: Device
+      platform:
+        description: платформа (ios, android, windows)
+        type: string
+        x-go-name: Platform
+      version_app:
+        description: версия приложения (произвольная строка)
+        type: string
+        x-go-name: VersionApp
+    type: object
+    x-go-name: PostAuthTokenParamsBodyMeta
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  postFeedbackOKBody:
+    description: PostFeedbackOKBody post feedback o k body
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      data:
+        description: data
+        type: object
+        x-go-name: Data
+    type: object
+    x-go-name: PostFeedbackOKBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  postFeedbackParamsBody:
+    description: PostFeedbackParamsBody post feedback params body
+    properties:
+      body:
+        description: body
+        type: string
+        x-go-name: Body
+      email:
+        description: email
+        type: string
+        x-go-name: Email
+      title:
+        description: title
+        type: string
+        x-go-name: Title
+    type: object
+    x-go-name: PostFeedbackParamsBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  postIdentityDocumentNewResourceOKBody:
+    description: PostIdentityDocumentNewResourceOKBody post identity document new
+      resource o k body
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      data:
+        $ref: '#/definitions/postIdentityDocumentNewResourceOKBodyData'
+    type: object
+    x-go-name: PostIdentityDocumentNewResourceOKBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  postIdentityDocumentNewResourceOKBodyData:
+    description: PostIdentityDocumentNewResourceOKBodyData post identity document
+      new resource o k body data
+    properties:
+      resource_id:
+        description: resource id
+        format: int64
+        type: integer
+        x-go-name: ResourceID
+      upload_link:
+        description: ссылка для загрузки медия ресурса
+        type: string
+        x-go-name: UploadLink
+    type: object
+    x-go-name: PostIdentityDocumentNewResourceOKBodyData
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  postIdentityDocumentNewResourceParamsBody:
+    description: PostIdentityDocumentNewResourceParamsBody post identity document
+      new resource params body
+    properties:
+      content_type:
+        description: content type
+        type: string
+        x-go-name: ContentType
+    type: object
+    x-go-name: PostIdentityDocumentNewResourceParamsBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  postUserAgreementOKBody:
+    description: PostUserAgreementOKBody post user agreement o k body
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      data:
+        $ref: '#/definitions/SessionInfoModel'
+    type: object
+    x-go-name: PostUserAgreementOKBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  postUserProfileOKBody:
+    description: PostUserProfileOKBody post user profile o k body
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      data:
+        description: data
+        type: object
+        x-go-name: Data
+    type: object
+    x-go-name: PostUserProfileOKBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  postUserProfileParamsBody:
+    description: PostUserProfileParamsBody post user profile params body
+    properties:
+      email:
+        description: почтовый ящик поручителя
+        format: email
+        type: string
+        x-go-name: Email
+      name:
+        $ref: '#/definitions/NameModel'
+    required:
+    - email
+    type: object
+    x-go-name: PostUserProfileParamsBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  putIdentityDocumentAttachResourceOKBody:
+    description: PutIdentityDocumentAttachResourceOKBody put identity document attach
+      resource o k body
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      data:
+        $ref: '#/definitions/putIdentityDocumentAttachResourceOKBodyData'
+    type: object
+    x-go-name: PutIdentityDocumentAttachResourceOKBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  putIdentityDocumentAttachResourceOKBodyData:
+    description: PutIdentityDocumentAttachResourceOKBodyData put identity document
+      attach resource o k body data
+    properties:
+      uri:
+        description: ссылка для загрузки медия ресурса
+        type: string
+        x-go-name: URI
+    type: object
+    x-go-name: PutIdentityDocumentAttachResourceOKBodyData
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  putIdentityDocumentAttachResourceParamsBody:
+    description: PutIdentityDocumentAttachResourceParamsBody put identity document
+      attach resource params body
+    properties:
+      resource_id:
+        description: id ресурса
+        format: int64
+        type: integer
+        x-go-name: ResourceID
+      system_name:
+        description: наименование документа
+        type: string
+        x-go-name: SystemName
+    type: object
+    x-go-name: PutIdentityDocumentAttachResourceParamsBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  sessionInfoModelAccountInfo:
+    description: SessionInfoModelAccountInfo session info model account info
+    properties:
+      balance:
+        $ref: '#/definitions/BalanceModel'
+    type: object
+    x-go-name: SessionInfoModelAccountInfo
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  updateIdentityDocumentOKBody:
+    description: UpdateIdentityDocumentOKBody update identity document o k body
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      data:
+        $ref: '#/definitions/SessionInfoModel'
+    type: object
+    x-go-name: UpdateIdentityDocumentOKBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  updateIdentityDocumentParamsBody:
+    description: UpdateIdentityDocumentParamsBody update identity document params
+      body
+    properties:
+      birth:
+        $ref: '#/definitions/BirthModel'
+      identity_document:
+        $ref: '#/definitions/updateIdentityDocumentParamsBodyIdentityDocument'
+      identity_document_type:
+        $ref: '#/definitions/IdentityDocumentType'
+      name:
+        $ref: '#/definitions/NameModel'
+    type: object
+    x-go-name: UpdateIdentityDocumentParamsBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  updateIdentityDocumentParamsBodyIdentityDocument:
+    description: UpdateIdentityDocumentParamsBodyIdentityDocument update identity
+      document params body identity document
+    properties:
+      expire_date:
+        description: Дата оканчания
+        type: string
+        x-go-name: ExpireDate
+      iin:
+        description: ИИН
+        type: string
+        x-go-name: Iin
+      issue_code:
+        description: Код подразделения
+        type: string
+        x-go-name: IssueCode
+      issue_date:
+        description: Дата выдачи
+        type: string
+        x-go-name: IssueDate
+      issue_place:
+        description: Место выдачи
+        type: string
+        x-go-name: IssuePlace
+      number:
+        description: Номер
+        type: string
+        x-go-name: Number
+      registration:
+        description: Место регистрации
+        type: string
+        x-go-name: Registration
+      series:
+        description: Серия
+        type: string
+        x-go-name: Series
+      ssn:
+        description: Social security number
+        type: string
+        x-go-name: Ssn
+    type: object
+    x-go-name: UpdateIdentityDocumentParamsBodyIdentityDocument
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  updatePersonalDataOKBody:
+    description: UpdatePersonalDataOKBody update personal data o k body
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      data:
+        description: data
+        type: object
+        x-go-name: Data
+    type: object
+    x-go-name: UpdatePersonalDataOKBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  updatePersonalDataParamsBody:
+    description: UpdatePersonalDataParamsBody update personal data params body
+    properties:
+      birth:
+        $ref: '#/definitions/BirthModel'
+      identity_document:
+        $ref: '#/definitions/updatePersonalDataParamsBodyIdentityDocument'
+      identity_document_type:
+        $ref: '#/definitions/IdentityDocumentType'
+      name:
+        $ref: '#/definitions/NameModel'
+    type: object
+    x-go-name: UpdatePersonalDataParamsBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  updatePersonalDataParamsBodyIdentityDocument:
+    description: UpdatePersonalDataParamsBodyIdentityDocument update personal data
+      params body identity document
+    properties:
+      expire_date:
+        description: Дата оканчания
+        type: string
+        x-go-name: ExpireDate
+      iin:
+        description: ИИН
+        type: string
+        x-go-name: Iin
+      issue_code:
+        description: Код подразделения
+        type: string
+        x-go-name: IssueCode
+      issue_date:
+        description: Дата выдачи
+        type: string
+        x-go-name: IssueDate
+      issue_place:
+        description: Место выдачи
+        type: string
+        x-go-name: IssuePlace
+      number:
+        description: Номер
+        type: string
+        x-go-name: Number
+      registration:
+        description: Место регистрации
+        type: string
+        x-go-name: Registration
+      series:
+        description: Серия
+        type: string
+        x-go-name: Series
+      ssn:
+        description: Social security number
+        type: string
+        x-go-name: Ssn
+    type: object
+    x-go-name: UpdatePersonalDataParamsBodyIdentityDocument
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
+  userDeleteByTokenOKBody:
+    description: UserDeleteByTokenOKBody user delete by token o k body
+    properties:
+      code:
+        $ref: '#/definitions/ResponseType'
+      data:
+        description: data
+        type: object
+        x-go-name: Data
+    type: object
+    x-go-name: UserDeleteByTokenOKBody
+    x-go-package: github.com/e154/smart-home-gate/vendor/bitbucket.org/suretly_team/backend_side/api/mobile2/stub/models
 info:
   contact:
     email: support@e154.ru
@@ -26,6 +1837,25 @@ paths:
       summary: index page
       tags:
       - index
+  /server/{any}:
+    get:
+      consumes:
+      - text/plain
+      operationId: server
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Success response
+        "400": {}
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "500": {}
+      summary: proxy controllers to server
+      tags:
+      - server
 produces:
 - application/json
 securityDefinitions:

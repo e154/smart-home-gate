@@ -10,3 +10,9 @@ type StreamRequestModel struct {
 	Body   []byte      `json:"body"`
 	Header http.Header `json:"header"`
 }
+
+type StreamResponseModel struct {
+	Code   int         `json:"code"`
+	Body   []byte      `json:"body"`
+	Header http.Header `json:"header"`
+}

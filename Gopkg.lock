@@ -51,14 +51,6 @@
   version = "v1.11.1"
 
 [[projects]]
-  digest = "1:76dc72490af7174349349838f2fe118996381b31ea83243812a97e5a0fd5ed55"
-  name = "github.com/dgrijalva/jwt-go"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "06ea1031745cb8b3dab3f6a236daf2b0aa468b7e"
-  version = "v3.2.0"
-
-[[projects]]
   digest = "1:af43bdaaf86655a2343f113e9b293bbc16b12099eaeb223982bbe4d4c22ba14d"
   name = "github.com/fatih/structs"
   packages = ["."]
@@ -209,6 +201,14 @@
   packages = ["."]
   pruneopts = "UT"
   revision = "e506e3ef73653e84c592ba44aab577a46678f68c"
+
+[[projects]]
+  branch = "master"
+  digest = "1:ae940e9156d0d778ce1991bcc99e58fa5ca2790ddf7c5f0bc05385854416f7a6"
+  name = "github.com/jinzhu/copier"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "976e0346caa839d22a17f8031a96bcd0870c0128"
 
 [[projects]]
   digest = "1:777a682d72e7ff9dc6f139e6eb8edfaf3b8cbbd0f47023fdef174aede101e6bd"
@@ -461,9 +461,9 @@
   analyzer-version = 1
   input-imports = [
     "bitbucket.org/suretly_team/backend_side/config",
-    "github.com/dgrijalva/jwt-go",
     "github.com/gin-gonic/gin",
     "github.com/gorilla/websocket",
+    "github.com/jinzhu/copier",
     "github.com/jinzhu/gorm",
     "github.com/lib/pq",
     "github.com/op/go-logging",

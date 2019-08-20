@@ -7,17 +7,16 @@ import (
 	"github.com/e154/smart-home-gate/adaptors"
 	"github.com/e154/smart-home-gate/api/server"
 	"github.com/e154/smart-home-gate/common"
-	"github.com/e154/smart-home-gate/common/debug"
 	m "github.com/e154/smart-home-gate/models"
 	"github.com/e154/smart-home-gate/system/graceful_service"
 	"github.com/e154/smart-home-gate/system/stream"
 	"github.com/e154/smart-home-gate/system/uuid"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/render"
 	"github.com/gorilla/websocket"
 	"github.com/op/go-logging"
 	"io/ioutil"
 	"net/http"
-	"net/http/httptest"
 	"strconv"
 	"strings"
 	"time"
@@ -61,23 +60,12 @@ func (s *StreamProxy) Shutdown() {
 
 func (s *StreamProxy) DoAction(client *stream.Client, message stream.Message) {
 
-	fmt.Println("------")
-	debug.Println(client)
-	fmt.Println("------")
-	debug.Println(message)
+	//fmt.Println("------")
+	//debug.Println(client)
+	//fmt.Println("------")
+	//debug.Println(message)
 
 	return
-}
-
-func (s *StreamProxy) execRequest() {
-
-	recorder := httptest.NewRecorder()
-	request, _ := http.NewRequest("GET", "/api/v1/", nil)
-	request.SetBasicAuth("admin", "admin")
-
-	s.engine.ServeHTTP(recorder, request)
-	fmt.Println(recorder.Code)
-	fmt.Println(recorder.Body)
 }
 
 // access_token
@@ -176,15 +164,16 @@ func (s *StreamProxy) controller(ctx *gin.Context) {
 		return
 	}
 
+	url := strings.Replace(ctx.Request.RequestURI, "/server", "", -1)
 	streamRequestModel := &StreamRequestModel{
-		URI:    ctx.Request.RequestURI,
+		URI:    url,
 		Method: strings.ToUpper(ctx.Request.Method),
 		Body:   body,
 		Header: ctx.Request.Header,
 	}
 
-	fmt.Printf("serverId: %v\n", serverObj.Id)
-	fmt.Printf("streamRequestModel: %v\n", streamRequestModel)
+	//fmt.Printf("serverId: %v\n", serverObj.Id)
+	//fmt.Printf("streamRequestModel: %v\n", streamRequestModel)
 
 	var client *stream.Client
 	if client, err = s.streamService.GetClientByIdAndType(serverObj.Id, stream.ClientTypeServer); err != nil {
@@ -197,15 +186,31 @@ func (s *StreamProxy) controller(ctx *gin.Context) {
 		return
 	}
 
-	debug.Println(client)
+	//debug.Println(client)
 
 	payload := map[string]interface{}{
 		"request": streamRequestModel,
 	}
 
 	s.Send("mobile_gate_proxy", payload, client, ctx, func(msg stream.Message) {
-		fmt.Println("ok")
-		debug.Println(msg)
+
+		//debug.Println(msg.Payload)
+
+		if _, ok := msg.Payload["response"]; !ok {
+			log.Error("no response field from payload")
+			return
+		}
+
+		r := &StreamResponseModel{}
+		common.Copy(&r, msg.Payload["response"], common.JsonEngine)
+
+		//fmt.Println(string(r.Body))
+
+		for k, _ := range r.Header {
+			ctx.Set(k, r.Header.Get(k))
+		}
+
+		ctx.Render(r.Code, render.Data{Data: r.Body, ContentType: "application/json; charset=utf-8"})
 	})
 
 	return
