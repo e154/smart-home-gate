@@ -15,11 +15,16 @@
 //
 //     Security:
 //     - ApiKeyAuth
+//     - ServerAuthorization
 //
 //     SecurityDefinitions:
 //     ApiKeyAuth:
 //          type: apiKey
 //          name: Authorization
+//          in: header
+//     ServerAuthorization:
+//          type: apiKey
+//          name: ServerAuthorization
 //          in: header
 //
 // swagger:meta

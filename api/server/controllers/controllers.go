@@ -8,6 +8,7 @@ import (
 type Controllers struct {
 	Index   *ControllerIndex
 	Swagger *ControllerSwagger
+	Check   *ControllerCheck
 }
 
 func NewControllers(adaptors *adaptors.Adaptors,
@@ -16,5 +17,6 @@ func NewControllers(adaptors *adaptors.Adaptors,
 	return &Controllers{
 		Index:   NewControllerIndex(common),
 		Swagger: NewControllerSwagger(common),
+		Check:   NewControllerCheck(common),
 	}
 }

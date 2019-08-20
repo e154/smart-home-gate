@@ -12,6 +12,7 @@ var (
 type Endpoint struct {
 	*Mobile
 	*Server
+	*Check
 }
 
 func NewEndpoint(adaptors *adaptors.Adaptors) IEndpoint {
@@ -19,5 +20,6 @@ func NewEndpoint(adaptors *adaptors.Adaptors) IEndpoint {
 	return &Endpoint{
 		Mobile: NewMobile(common),
 		Server: NewServer(common),
+		Check:  NewCheck(common),
 	}
 }

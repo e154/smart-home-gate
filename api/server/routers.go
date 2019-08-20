@@ -17,6 +17,10 @@ func (s *Server) setControllers() {
 	})
 	basePath.GET("/swagger/*any", s.Controllers.Swagger.WrapHandler(swaggerFiles.Handler))
 
+	// check
+	basePath.GET("/check/mobile_access_token", s.Controllers.Check.CheckMobileAccessToken)
+	basePath.GET("/check/mobile_access", s.Controllers.Check.CheckMobileAccess)
+
 	// ws
 	basePath.GET("/ws", s.streamService.Ws)
 	basePath.GET("/ws/*any", s.streamService.Ws)

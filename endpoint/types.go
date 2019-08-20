@@ -7,6 +7,7 @@ import (
 type IEndpoint interface {
 	IEndpointMobile
 	IEndpointServer
+	IEndpointCheck
 }
 
 type IEndpointMobile interface {
@@ -18,4 +19,8 @@ type IEndpointMobile interface {
 type IEndpointServer interface {
 	RegisterServer() (string, error)
 	RemoveServerToken(*m.Server) error
+}
+
+type IEndpointCheck interface {
+	CheckMobileAccessToken(string) bool
 }

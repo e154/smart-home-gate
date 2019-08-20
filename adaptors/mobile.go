@@ -64,6 +64,7 @@ func (n *Mobile) GetById(verId string) (ver *m.Mobile, err error) {
 	id, err := common.GetIdFromHash(verId, HashSalt)
 	if err != nil {
 		log.Error(err.Error())
+		return 
 	}
 
 	var dbVer *db.Mobile

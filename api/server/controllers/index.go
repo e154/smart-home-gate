@@ -36,6 +36,8 @@ func (i ControllerIndex) Index(c *gin.Context) {
 // ---
 // summary: proxy controllers to server
 // description:
+// security:
+// - ServerAuthorization: []
 // consumes:
 // - text/plain
 // produces:
