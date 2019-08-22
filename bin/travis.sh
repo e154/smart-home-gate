@@ -97,27 +97,26 @@ __clean() {
 
 __build() {
 
-#    mkdir -p ${TMP_DIR}
-#
-#    # build
-#    cd ${TMP_DIR}
-#
-#    BRANCH="$(git name-rev --name-only HEAD)"
-#
-#    if [[ $BRANCH == *"tags/"* ]]; then
-#      BRANCH="master"
-#    fi
-#
-#    echo "BRANCH ${BRANCH}"
-#
-#    echo ""
-#    echo "build command:"
-#    echo "xgo --out=${EXEC} --branch=${BRANCH} --targets=linux/*,windows/*,darwin/* --ldflags='${GOBUILD_LDFLAGS}' ${PACKAGE}"
-#    echo ""
-#
-#    xgo --out=${EXEC} --branch=${BRANCH} --targets=linux/*,windows/*,darwin/* --ldflags="${GOBUILD_LDFLAGS}" ${ROOT}
+    mkdir -p ${TMP_DIR}
 
-    mkdir -p ${TMP_DIR}/api/server/docs/swagger
+    # build
+    cd ${TMP_DIR}
+
+    BRANCH="$(git name-rev --name-only HEAD)"
+
+    if [[ $BRANCH == *"tags/"* ]]; then
+      BRANCH="master"
+    fi
+
+    echo "BRANCH ${BRANCH}"
+
+    echo ""
+    echo "build command:"
+    echo "xgo --out=${EXEC} --branch=${BRANCH} --targets=linux/*,windows/*,darwin/* --ldflags='${GOBUILD_LDFLAGS}' ${PACKAGE}"
+    echo ""
+
+    xgo --out=${EXEC} --branch=${BRANCH} --targets=linux/*,windows/*,darwin/* --ldflags="${GOBUILD_LDFLAGS}" ${ROOT}
+
     cp ${ROOT}/api/server/docs/swagger.yaml ${TMP_DIR}/api/server/docs/
 
     cp -r ${ROOT}/conf ${TMP_DIR}
