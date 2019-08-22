@@ -117,6 +117,7 @@ __build() {
 
     xgo --out=${EXEC} --branch=${BRANCH} --targets=linux/*,windows/*,darwin/* --ldflags="${GOBUILD_LDFLAGS}" ${ROOT}
 
+    mkdir -p ${TMP_DIR}/api/server/docs/
     cp ${ROOT}/api/server/docs/swagger.yaml ${TMP_DIR}/api/server/docs/
 
     cp -r ${ROOT}/conf ${TMP_DIR}
