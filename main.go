@@ -6,7 +6,6 @@ import (
 	"github.com/e154/smart-home-gate/api/websocket"
 	"github.com/e154/smart-home-gate/system/graceful_service"
 	l "github.com/e154/smart-home-gate/system/logging"
-	"github.com/e154/smart-home-gate/system/migrations"
 	"github.com/e154/smart-home-gate/system/stream_proxy"
 	"github.com/op/go-logging"
 	"os"
@@ -38,15 +37,7 @@ func start() {
 	fmt.Printf(shortVersionBanner, "")
 
 	container := BuildContainer()
-	err := container.Invoke(func(m *migrations.Migrations) {
-		m.Up()
-	})
-
-	if err != nil {
-		panic(err.Error())
-	}
-
-	err = container.Invoke(func(server *server.Server,
+	err := container.Invoke(func(server *server.Server,
 		graceful *graceful_service.GracefulService,
 		back *l.LogBackend,
 		ws *websocket.WebSocket,

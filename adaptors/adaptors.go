@@ -2,6 +2,7 @@ package adaptors
 
 import (
 	"github.com/e154/smart-home-gate/system/config"
+	"github.com/e154/smart-home-gate/system/migrations"
 	"github.com/jinzhu/gorm"
 	"github.com/op/go-logging"
 )
@@ -18,7 +19,12 @@ type Adaptors struct {
 }
 
 func NewAdaptors(db *gorm.DB,
-	cfg *config.AppConfig) (adaptors *Adaptors) {
+	cfg *config.AppConfig,
+	migrations *migrations.Migrations) (adaptors *Adaptors) {
+
+	if cfg.AutoMigrate {
+		migrations.Up()
+	}
 
 	adaptors = &Adaptors{
 		Server:   GetServerAdaptor(db),

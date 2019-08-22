@@ -3,6 +3,7 @@ package config
 type AppConfig struct {
 	ServerHost        string `json:"server_host"`
 	ServerPort        int    `json:"server_port"`
+	AutoMigrate       bool   `json:"auto_migrate"`
 	PgUser            string `json:"pg_user"`
 	PgPass            string `json:"pg_pass"`
 	PgHost            string `json:"pg_host"`

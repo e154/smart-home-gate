@@ -4,3 +4,4 @@ vendor/*
 conf/config.json
 conf/dbconfig.yml
 smart-home-gate
+tmp/*
