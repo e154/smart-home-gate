@@ -199,7 +199,7 @@
 //     dig.In
 //
 //     Conn  *sql.DB
-//     Cache *redis.Client `optional:"true"`
+//     Cache *redis.Mobile `optional:"true"`
 //   }
 //
 // If an optional field is not available in the container, the constructor

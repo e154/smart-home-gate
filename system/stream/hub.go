@@ -1,7 +1,6 @@
 package stream
 
 import (
-	"encoding/json"
 	"github.com/gorilla/websocket"
 	"io/ioutil"
 	"os"
@@ -13,13 +12,13 @@ import (
 const (
 	writeWait      = 10 * time.Second
 	maxMessageSize = 512
-	pongWait       = 60 * time.Second
+	pongWait       = 10 * time.Second
 	pingPeriod     = (pongWait * 9) / 10
 )
 
 type Hub struct {
 	sessions    map[*Client]bool
-	subscribers map[string]func(client *Client, value interface{})
+	subscribers map[string]func(client *Client, msg Message)
 	sync.Mutex
 	broadcast chan []byte
 	interrupt chan os.Signal
@@ -33,7 +32,7 @@ func NewHub() *Hub {
 	hub := &Hub{
 		sessions:    make(map[*Client]bool),
 		broadcast:   make(chan []byte, maxMessageSize),
-		subscribers: make(map[string]func(client *Client, value interface{})),
+		subscribers: make(map[string]func(client *Client, msg Message)),
 		interrupt:   interrupt,
 	}
 	go hub.Run()
@@ -45,47 +44,45 @@ func (h *Hub) AddClient(client *Client) {
 
 	defer func() {
 		delete(h.sessions, client)
-		log.Infof("websocket session from ip: %s closed", client.Ip)
+		log.Infof("websocket session from ip(%s) closed, id(%s)", client.Ip, client.Id)
 	}()
 
 	h.sessions[client] = true
-	switch client.ConnType {
-	//case SOCKJS:
-	//	log.Infof("new sockjs session established, from ip: %s", client.Ip)
-	//
-	//	for {
-	//		if msg, err := client.Session.Recv(); err == nil {
-	//			h.Recv(client, []byte(msg))
-	//			continue
-	//		}
-	//		break
-	//	}
-	case WEBSOCK:
-		log.Infof("new websocket xsession established, from ip: %s", client.Ip)
 
-		//client.Connect.SetReadLimit(maxMessageSize)
-		client.Connect.SetReadDeadline(time.Now().Add(pongWait))
-		client.Connect.SetPongHandler(func(string) error {
-			client.Connect.SetReadDeadline(time.Now().Add(pongWait));
-			return nil
-		})
-		for {
-			op, r, err := client.Connect.NextReader()
+	log.Infof("new websocket session established, from ip(%s), type(%v), id(%s)", client.Ip, client.Type, client.Id)
+
+	_ = client.Connect.SetReadDeadline(time.Now().Add(pongWait))
+	client.Connect.SetPongHandler(func(string) error {
+		_ = client.Connect.SetReadDeadline(time.Now().Add(pongWait))
+		return nil
+	})
+	for {
+		op, r, err := client.Connect.NextReader()
+		if err != nil {
+			log.Debug(err.Error())
+			break
+		}
+		switch op {
+		case websocket.TextMessage:
+			message, err := ioutil.ReadAll(r)
 			if err != nil {
 				break
 			}
-			switch op {
-			case websocket.TextMessage:
-				message, err := ioutil.ReadAll(r)
-				if err != nil {
-					break
-				}
-				h.Recv(client, message)
-			}
+			h.Recv(client, message)
 		}
-	default:
-		log.Warningf("unknown conn type %s", client.ConnType)
 	}
+}
+
+func (h *Hub) GetClientByIdAndType(clientId, clientType string) (client *Client, err error) {
+
+	for cli, _ := range h.sessions {
+		if cli.Id == clientId && cli.Type == clientType {
+			client = cli
+			return
+		}
+	}
+
+	return
 }
 
 func (h *Hub) Run() {
@@ -107,25 +104,22 @@ func (h *Hub) Run() {
 	}
 }
 
-func (h *Hub) Recv(client *Client, message []byte) {
+func (h *Hub) Recv(client *Client, b []byte) {
 
-	re := map[string]interface{}{}
-	if err := json.Unmarshal(message, &re); err != nil {
-		client.Notify("error", err.Error())
+	//fmt.Printf("client(%v), message(%v)\n", client, string(b))
+
+	msg, err := NewMessage(b)
+	if err != nil {
+		log.Error(err.Error())
 		return
 	}
 
-	for key, value := range re {
+	switch msg.Command {
+	default:
+		for command, f := range h.subscribers {
 
-		switch key {
-		case "client_info":
-			client.UpdateInfo(value)
-
-		default:
-			for command, f := range h.subscribers {
-				if key == command {
-					f(client, value)
-				}
+			if msg.Command == command {
+				f(client, msg)
 			}
 		}
 	}
@@ -151,7 +145,7 @@ func (h *Hub) Clients() (clients []*Client) {
 	return
 }
 
-func (h *Hub) Subscribe(command string, f func(client *Client, value interface{})) {
+func (h *Hub) Subscribe(command string, f func(client *Client, msg Message)) {
 	log.Infof("subscribe %s", command)
 	if h.subscribers[command] != nil {
 		delete(h.subscribers, command)
@@ -160,6 +154,7 @@ func (h *Hub) Subscribe(command string, f func(client *Client, value interface{}
 }
 
 func (h *Hub) UnSubscribe(command string) {
+	log.Infof("unsubscribe %s", command)
 	if h.subscribers[command] != nil {
 		delete(h.subscribers, command)
 	}

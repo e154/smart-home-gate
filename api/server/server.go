@@ -15,11 +15,16 @@
 //
 //     Security:
 //     - ApiKeyAuth
+//     - ServerAuthorization
 //
 //     SecurityDefinitions:
 //     ApiKeyAuth:
 //          type: apiKey
 //          name: Authorization
+//          in: header
+//     ServerAuthorization:
+//          type: apiKey
+//          name: ServerAuthorization
 //          in: header
 //
 // swagger:meta
@@ -75,10 +80,13 @@ func (s *Server) Shutdown() {
 	log.Info("Server exiting")
 }
 
+func (s *Server) GetEngine() *gin.Engine {
+	return s.engine
+}
+
 func NewServer(cfg *ServerConfig,
-	ctrls *controllers.Controllers,
-	streamService *stream.StreamService,
-	) (newServer *Server) {
+	controllers *controllers.Controllers,
+	streamService *stream.StreamService) (newServer *Server) {
 
 	logger := &ServerLogger{log}
 
@@ -92,7 +100,7 @@ func NewServer(cfg *ServerConfig,
 
 	newServer = &Server{
 		Config:        cfg,
-		Controllers:   ctrls,
+		Controllers:   controllers,
 		engine:        engine,
 		logger:        logger,
 		streamService: streamService,

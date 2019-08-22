@@ -31,3 +31,25 @@ func (i ControllerIndex) Index(c *gin.Context) {
 	c.String(http.StatusOK, apiVersion)
 	return
 }
+
+// swagger:operation GET /server/{any} server
+// ---
+// summary: proxy controllers to server
+// description:
+// security:
+// - ServerAuthorization: []
+// consumes:
+// - text/plain
+// produces:
+// - text/plain
+// tags:
+// - server
+// responses:
+//   "200":
+//	   description: Success response
+//   "400":
+//   "401":
+//     description: "Unauthorized"
+//   "403":
+//     description: "Forbidden"
+//   "500":

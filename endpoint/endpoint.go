@@ -10,11 +10,16 @@ var (
 )
 
 type Endpoint struct {
+	*Mobile
+	*Server
+	*Check
 }
 
-func NewEndpoint(adaptors *adaptors.Adaptors) *Endpoint {
-	//common := NewCommonEndpoint(adaptors)
+func NewEndpoint(adaptors *adaptors.Adaptors) IEndpoint {
+	common := NewCommonEndpoint(adaptors)
 	return &Endpoint{
-
+		Mobile: NewMobile(common),
+		Server: NewServer(common),
+		Check:  NewCheck(common),
 	}
 }

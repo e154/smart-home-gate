@@ -4,6 +4,7 @@ import (
 	"github.com/e154/smart-home-gate/adaptors"
 	"github.com/e154/smart-home-gate/api/server"
 	"github.com/e154/smart-home-gate/api/server/controllers"
+	"github.com/e154/smart-home-gate/api/websocket"
 	"github.com/e154/smart-home-gate/endpoint"
 	"github.com/e154/smart-home-gate/system/config"
 	"github.com/e154/smart-home-gate/system/dig"
@@ -12,6 +13,7 @@ import (
 	"github.com/e154/smart-home-gate/system/migrations"
 	"github.com/e154/smart-home-gate/system/orm"
 	"github.com/e154/smart-home-gate/system/stream"
+	"github.com/e154/smart-home-gate/system/stream_proxy"
 )
 
 func BuildContainer() (container *dig.Container) {
@@ -34,6 +36,8 @@ func BuildContainer() (container *dig.Container) {
 	container.Provide(stream.NewStreamService)
 	container.Provide(stream.NewHub)
 	container.Provide(endpoint.NewEndpoint)
+	container.Provide(websocket.NewWebSocket)
+	container.Provide(stream_proxy.NewStreamProxy)
 
 	return
 }

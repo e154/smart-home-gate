@@ -26,11 +26,68 @@ paths:
       summary: index page
       tags:
       - index
+  /check/mobile_access:
+    get:
+      consumes:
+      - text/plain
+      operationId: check
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Success response
+      summary: mobile access connection page
+      tags:
+      - check
+  /check/mobile_access_token:
+    get:
+      consumes:
+      - text/plain
+      operationId: check
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Success response
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+      security:
+      - ServerAuthorization: []
+      summary: mobile access token check page
+      tags:
+      - check
+  /server/{any}:
+    get:
+      consumes:
+      - text/plain
+      operationId: server
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Success response
+        "400": {}
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "500": {}
+      security:
+      - ServerAuthorization: []
+      summary: proxy controllers to server
+      tags:
+      - server
 produces:
 - application/json
 securityDefinitions:
   ApiKeyAuth:
     in: header
     name: Authorization
+    type: apiKey
+  ServerAuthorization:
+    in: header
+    name: ServerAuthorization
     type: apiKey
 swagger: "2.0"

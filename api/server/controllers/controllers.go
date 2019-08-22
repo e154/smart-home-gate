@@ -8,13 +8,15 @@ import (
 type Controllers struct {
 	Index   *ControllerIndex
 	Swagger *ControllerSwagger
+	Check   *ControllerCheck
 }
 
 func NewControllers(adaptors *adaptors.Adaptors,
-	endpoint *endpoint.Endpoint) *Controllers {
+	endpoint endpoint.IEndpoint) *Controllers {
 	common := NewControllerCommon(adaptors, endpoint)
 	return &Controllers{
 		Index:   NewControllerIndex(common),
 		Swagger: NewControllerSwagger(common),
+		Check:   NewControllerCheck(common),
 	}
 }
