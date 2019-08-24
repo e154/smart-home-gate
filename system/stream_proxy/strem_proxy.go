@@ -261,7 +261,7 @@ func (g *StreamProxy) Send(command string, payload map[string]interface{}, clien
 	}
 
 	select {
-	case <-time.After(2 * time.Second):
+	case <-time.After(5 * time.Second):
 		ctx.AbortWithStatus(http.StatusRequestTimeout)
 	case <-done:
 	case <-ctx.Done():

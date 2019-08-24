@@ -17,7 +17,7 @@ type IEndpointMobile interface {
 }
 
 type IEndpointServer interface {
-	RegisterServer() (string, error)
+	RegisterServer() (*m.Server, error)
 	RemoveServerToken(*m.Server) error
 }
 

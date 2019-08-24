@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	m "github.com/e154/smart-home-gate/models"
 	"github.com/e154/smart-home-gate/system/stream"
 )
 
@@ -25,16 +26,25 @@ func (c *ControllerServer) RegisterServer(client *stream.Client, message stream.
 
 	log.Info("call register server")
 
-	token, err := c.endpoint.RegisterServer()
-	if err != nil {
-		c.Err(client, message, err)
-		return
+	var accessToken string
+	if client.Id == "" {
+		server, err := c.endpoint.RegisterServer()
+		if err != nil {
+			c.Err(client, message, err)
+			return
+		}
+		accessToken = server.GenAccessToken()
+
+	} else {
+		server := &m.Server{
+			Id:    client.Id,
+			Token: client.Token,
+		}
+		accessToken = server.GenAccessToken()
 	}
 
-	client.Token = token
-
 	payload := map[string]interface{}{
-		"token": token,
+		"token": accessToken,
 	}
 	response := message.Response(payload)
 
