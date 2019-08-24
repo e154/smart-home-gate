@@ -150,6 +150,23 @@ func (s *StreamProxy) auth(ctx *gin.Context) {
 
 func (s *StreamProxy) controller(ctx *gin.Context) {
 
+	defer func() {
+		var err error
+		if r := recover(); r != nil {
+			switch x := r.(type) {
+			case string:
+				err = errors.New(x)
+			case error:
+				err = x
+			default:
+				err = errors.New("Unknown panic")
+			}
+		}
+		if err != nil {
+			log.Error(err.Error())
+		}
+	}()
+
 	var serverObj *m.Server
 	if _, ok := ctx.Keys["server"]; ok {
 		serverObj = ctx.Keys["server"].(*m.Server)
@@ -202,7 +219,9 @@ func (s *StreamProxy) controller(ctx *gin.Context) {
 		}
 
 		r := &StreamResponseModel{}
-		_ = common.Copy(&r, msg.Payload["response"], common.JsonEngine)
+		if err = common.Copy(&r, msg.Payload["response"], common.JsonEngine); err != nil {
+			log.Error(err.Error())
+		}
 
 		//fmt.Println(string(r.Body))
 
@@ -242,7 +261,7 @@ func (g *StreamProxy) Send(command string, payload map[string]interface{}, clien
 	}
 
 	select {
-	case <-time.After(2 * time.Second):
+	case <-time.After(5 * time.Second):
 		ctx.AbortWithStatus(http.StatusRequestTimeout)
 	case <-done:
 	case <-ctx.Done():

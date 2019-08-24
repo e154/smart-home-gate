@@ -13,17 +13,15 @@ func NewServer(common *CommonEndpoint) *Server {
 	return &Server{CommonEndpoint: common}
 }
 
-func (s *Server) RegisterServer() (token string, err error) {
+func (s *Server) RegisterServer() (server *m.Server, err error) {
 
-	serverClient := &m.Server{
+	server = &m.Server{
 		Token: uuid.NewV4().String(),
 	}
 
-	if _, err = s.adaptors.Server.Add(serverClient); err != nil {
+	if server.Id, err = s.adaptors.Server.Add(server); err != nil {
 		return
 	}
-
-	token = serverClient.GenAccessToken()
 
 	return
 }

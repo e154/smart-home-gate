@@ -71,6 +71,8 @@ func (h *Hub) AddClient(client *Client) {
 			h.Recv(client, message)
 		}
 	}
+
+	log.Infof("websocket session closed id(%s)", client.Id)
 }
 
 func (h *Hub) GetClientByIdAndType(clientId, clientType string) (client *Client, err error) {
