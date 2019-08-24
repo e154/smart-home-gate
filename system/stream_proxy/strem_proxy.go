@@ -202,7 +202,9 @@ func (s *StreamProxy) controller(ctx *gin.Context) {
 		}
 
 		r := &StreamResponseModel{}
-		_ = common.Copy(&r, msg.Payload["response"], common.JsonEngine)
+		if err = common.Copy(&r, msg.Payload["response"], common.JsonEngine); err != nil {
+			log.Error(err.Error())
+		}
 
 		//fmt.Println(string(r.Body))
 
