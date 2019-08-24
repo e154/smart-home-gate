@@ -150,6 +150,23 @@ func (s *StreamProxy) auth(ctx *gin.Context) {
 
 func (s *StreamProxy) controller(ctx *gin.Context) {
 
+	defer func() {
+		var err error
+		if r := recover(); r != nil {
+			switch x := r.(type) {
+			case string:
+				err = errors.New(x)
+			case error:
+				err = x
+			default:
+				err = errors.New("Unknown panic")
+			}
+		}
+		if err != nil {
+			log.Error(err.Error())
+		}
+	}()
+
 	var serverObj *m.Server
 	if _, ok := ctx.Keys["server"]; ok {
 		serverObj = ctx.Keys["server"].(*m.Server)
