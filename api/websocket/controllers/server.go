@@ -35,13 +35,21 @@ func (c *ControllerServer) RegisterServer(client *stream.Client, message stream.
 		}
 		accessToken = server.GenAccessToken()
 
+		client.Id = server.Id
+		client.Token = server.Token
+
+		log.Infof("register new server: %s", server.Id)
+
 	} else {
 		server := &m.Server{
 			Id:    client.Id,
 			Token: client.Token,
 		}
 		accessToken = server.GenAccessToken()
+		log.Infof("use client id: %s", client.Id)
 	}
+
+	log.Infof("accessToken %s", accessToken)
 
 	payload := map[string]interface{}{
 		"token": accessToken,
