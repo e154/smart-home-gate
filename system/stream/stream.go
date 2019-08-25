@@ -111,7 +111,8 @@ func (w *StreamService) Ws(ctx *gin.Context) {
 	} else {
 
 		switch clientType {
-		case ClientTypeServer, ClientTypeMobile:
+		case ClientTypeServer:
+		case ClientTypeMobile:
 		default:
 			ctx.AbortWithError(400, fmt.Errorf("unknown client type %v", clientType))
 			return
