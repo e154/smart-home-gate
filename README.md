@@ -9,7 +9,7 @@ Smart home mobile gate
 [Smart home Socket](https://github.com/e154/smart-home-socket/) |
 [Modbus device controller](https://github.com/e154/smart-home-modbus-ctrl-v1/) |
 
-[![Build Status](https://travis-ci.org/e154/smart-home-configurator.svg?branch=master)](https://travis-ci.org/e154/smart-home-configurator)
+[![Build Status](https://travis-ci.org/e154/smart-home-gate.svg?branch=master)](https://travis-ci.org/e154/smart-home-gate)
 ![status](https://img.shields.io/badge/status-beta-yellow.svg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
