@@ -24,7 +24,10 @@ func GetServerAdaptor(d *gorm.DB) *Server {
 
 func (n *Server) Add(ver *m.Server) (idStr string, err error) {
 
-	dbVer := n.toDb(ver)
+	var dbVer *db.Server
+	if dbVer, err = n.toDb(ver); err != nil {
+		return
+	}
 	var id int64
 	if id, err = n.table.Add(dbVer); err != nil {
 		return
@@ -37,33 +40,38 @@ func (n *Server) Add(ver *m.Server) (idStr string, err error) {
 }
 
 func (n *Server) Update(ver *m.Server) (err error) {
-	id, err := common.GetIdFromHash(ver.Id, HashSalt)
-	if err != nil {
+	var id int64
+	if id, err = common.GetIdFromHash(ver.Id, HashSalt); err != nil {
 		log.Error(err.Error())
+		return
 	}
 	if _, err = n.table.GetById(id); err != nil {
 		return
 	}
 
-	dbVer := n.toDb(ver)
+	var dbVer *db.Server
+	if dbVer, err = n.toDb(ver); err != nil {
+		return
+	}
 	err = n.table.Update(dbVer)
 	return
 }
 
 func (n *Server) Remove(ver *m.Server) (err error) {
-	id, err := common.GetIdFromHash(ver.Id, HashSalt)
-	if err != nil {
+	var id int64
+	if id, err = common.GetIdFromHash(ver.Id, HashSalt); err != nil {
 		log.Error(err.Error())
+		return
 	}
 	err = n.table.Remove(id)
 	return
 }
 
 func (n *Server) GetById(verId string) (ver *m.Server, err error) {
-
-	id, err := common.GetIdFromHash(verId, HashSalt)
-	if err != nil {
+	var id int64
+	if id, err = common.GetIdFromHash(verId, HashSalt); err != nil {
 		log.Error(err.Error())
+		return
 	}
 
 	var dbVer *db.Server
@@ -98,9 +106,10 @@ func (n *Server) GetByAccessToken(accessToken string) (ver *m.Server, err error)
 		return
 	}
 
-	id, err := common.GetIdFromHash(data[0], HashSalt)
-	if err != nil {
+	var id int64
+	if id, err = common.GetIdFromHash(data[0], HashSalt); err != nil {
 		log.Error(err.Error())
+		return
 	}
 
 	requestRandomId := data[1]
@@ -173,10 +182,11 @@ func (n *Server) fromDb(dbVer *db.Server) (ver *m.Server) {
 	return
 }
 
-func (n *Server) toDb(ver *m.Server) (dbVer *db.Server) {
-	id, err := common.GetIdFromHash(ver.Id, HashSalt)
-	if err != nil {
+func (n *Server) toDb(ver *m.Server) (dbVer *db.Server, err error) {
+	var id int64
+	if id, err = common.GetIdFromHash(ver.Id, HashSalt); err != nil {
 		log.Error(err.Error())
+		return
 	}
 	dbVer = &db.Server{
 		Id:        id,
