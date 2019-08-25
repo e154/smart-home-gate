@@ -24,7 +24,11 @@ func GetMobileAdaptor(d *gorm.DB) *Mobile {
 
 func (n *Mobile) Add(ver *m.Mobile) (idStr string, err error) {
 
-	dbVer := n.toDb(ver)
+	var dbVer *db.Mobile
+	if dbVer, err = n.toDb(ver); err != nil {
+		return
+	}
+
 	var id int64
 	if id, err = n.table.Add(dbVer); err != nil {
 		return
@@ -40,12 +44,14 @@ func (n *Mobile) Update(ver *m.Mobile) (err error) {
 	id, err := common.GetIdFromHash(ver.Id, HashSalt)
 	if err != nil {
 		log.Error(err.Error())
+		return
 	}
 	if _, err = n.table.GetById(id); err != nil {
 		return
 	}
 
-	dbVer := n.toDb(ver)
+	var dbVer *db.Mobile
+	dbVer, err = n.toDb(ver)
 	err = n.table.Update(dbVer)
 	return
 }
@@ -54,6 +60,7 @@ func (n *Mobile) Remove(ver *m.Mobile) (err error) {
 	id, err := common.GetIdFromHash(ver.Id, HashSalt)
 	if err != nil {
 		log.Error(err.Error())
+		return
 	}
 	err = n.table.Remove(id)
 	return
@@ -100,6 +107,7 @@ func (n *Mobile) GetByAccessToken(accessToken string) (ver *m.Mobile, err error)
 	id, err := common.GetIdFromHash(data[0], HashSalt)
 	if err != nil {
 		log.Error(err.Error())
+		return
 	}
 
 	requestRandomId := data[1]
@@ -169,14 +177,17 @@ func (n *Mobile) fromDb(dbVer *db.Mobile) (ver *m.Mobile) {
 	return
 }
 
-func (n *Mobile) toDb(ver *m.Mobile) (dbVer *db.Mobile) {
-	id, err := common.GetIdFromHash(ver.Id, HashSalt)
-	if err != nil {
+func (n *Mobile) toDb(ver *m.Mobile) (dbVer *db.Mobile, err error) {
+	var id int64
+	if id, err = common.GetIdFromHash(ver.Id, HashSalt); err != nil {
 		log.Error(err.Error())
+		return
 	}
-	serverId, err := common.GetIdFromHash(ver.ServerId, HashSalt)
-	if err != nil {
+
+	var serverId int64
+	if serverId, err = common.GetIdFromHash(ver.ServerId, HashSalt); err != nil {
 		log.Error(err.Error())
+		return
 	}
 	dbVer = &db.Mobile{
 		Id:        id,
