@@ -20,7 +20,7 @@ Gateway for connecting mobile clients to the server **smart home**. Controls acc
 Determining whether a client belongs to a server occurs through an access token issued to the client.
 It is possible to connect a large number of servers and client applications to the server at the same time.
 
-<img align="right" width="220" height="auto" src="doc/screenshot1.png" alt="smart home gate">
+<img height="auto" src="doc/screenshot1.png" alt="smart home gate">
 
 ### Installation for development
 
