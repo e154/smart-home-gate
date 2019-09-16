@@ -223,13 +223,18 @@ func (s *StreamProxy) controller(ctx *gin.Context) {
 			log.Error(err.Error())
 		}
 
+		//fmt.Println("----------")
+		//fmt.Println("response")
+		//fmt.Println("----------")
+		//fmt.Println(r.Code)
+		//fmt.Println(r.Header)
 		//fmt.Println(string(r.Body))
 
 		for k, _ := range r.Header {
-			ctx.Set(k, r.Header.Get(k))
+			ctx.Header(k, r.Header.Get(k))
 		}
 
-		ctx.Render(r.Code, render.Data{Data: r.Body, ContentType: "application/json; charset=utf-8"})
+		ctx.Render(r.Code, render.Data{Data: r.Body})
 	})
 
 	if err != nil {
