@@ -97,6 +97,8 @@ func (s *StreamProxy) auth(ctx *gin.Context) {
 		return
 	}
 
+	accessToken = strings.TrimSpace(accessToken)
+
 	data := strings.Split(accessToken, "-")
 	if len(data) != 4 {
 		ctx.AbortWithError(401, errors.New("unauthorized access"))
@@ -188,6 +190,14 @@ func (s *StreamProxy) controller(ctx *gin.Context) {
 		Body:   body,
 		Header: ctx.Request.Header,
 	}
+
+	//fmt.Println("-------")
+	//fmt.Println("request")
+	//fmt.Println("-------")
+	//fmt.Println(streamRequestModel.URI)
+	//fmt.Println(streamRequestModel.Method)
+	//fmt.Println(streamRequestModel.Header)
+	//fmt.Println(string(streamRequestModel.Body))
 
 	//fmt.Printf("serverId: %v\n", serverObj.Id)
 	//fmt.Printf("streamRequestModel: %v\n", streamRequestModel)
