@@ -1,6 +1,8 @@
 package stream
 
 import (
+	"github.com/e154/smart-home-gate/adaptors"
+	m "github.com/e154/smart-home-gate/models"
 	"github.com/gorilla/websocket"
 	"io/ioutil"
 	"os"
@@ -17,6 +19,7 @@ const (
 )
 
 type Hub struct {
+	adaptors    *adaptors.Adaptors
 	sessions    map[*Client]bool
 	subscribers map[string]func(client *Client, msg Message)
 	sync.Mutex
@@ -24,12 +27,13 @@ type Hub struct {
 	interrupt chan os.Signal
 }
 
-func NewHub() *Hub {
+func NewHub(adaptors *adaptors.Adaptors) *Hub {
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
 
 	hub := &Hub{
+		adaptors:    adaptors,
 		sessions:    make(map[*Client]bool),
 		broadcast:   make(chan []byte, maxMessageSize),
 		subscribers: make(map[string]func(client *Client, msg Message)),
@@ -106,7 +110,14 @@ func (h *Hub) Run() {
 	}
 }
 
+//
+// client --> server
+//
+// server --> [client1, client2]
+//
 func (h *Hub) Recv(client *Client, b []byte) {
+
+	log.Debugf("Receive message from client type(%v): %v", client.Type, client.Id)
 
 	//fmt.Printf("client(%v), message(%v)\n", client, string(b))
 
@@ -116,14 +127,58 @@ func (h *Hub) Recv(client *Client, b []byte) {
 		return
 	}
 
-	switch msg.Command {
-	default:
-		for command, f := range h.subscribers {
+	switch client.Type {
+	case ClientTypeServer:
+		switch msg.Command {
+		default:
+			for command, f := range h.subscribers {
 
-			if msg.Command == command {
-				f(client, msg)
+				if msg.Command == command {
+					f(client, msg)
+					return
+				}
 			}
 		}
+		var server *m.Server
+		if server, err = h.adaptors.Server.GetById(client.Id); err != nil {
+			log.Error(err.Error())
+			return
+		}
+		if server.Mobiles == nil && len(server.Mobiles) == 0 {
+			log.Info("clients for message not found")
+			return
+		}
+		for client, _ := range h.sessions {
+			if client.Type == ClientTypeServer {
+				continue
+			}
+			for _, mobile := range server.Mobiles {
+				if mobile.Id == client.Id {
+					log.Debugf("Resend to mobile client: %v", client.Id)
+					client.Send <- b
+				}
+			}
+		}
+
+	case ClientTypeMobile:
+		var mobile *m.Mobile
+		if mobile, err = h.adaptors.Mobile.GetByAccessToken(client.Token); err != nil {
+			log.Error(err.Error())
+			return
+		}
+		for client, _ := range h.sessions {
+			if client.Type == ClientTypeMobile {
+				continue
+			}
+			if mobile.ServerId == client.Id {
+				log.Debugf("Resend to server: %v", client.Id)
+				client.Send <- b
+				return
+			}
+			log.Warningf("server %s not found", mobile.ServerId	)
+		}
+	default:
+		log.Errorf("unknown client type: %v", client.Type)
 	}
 }
 
