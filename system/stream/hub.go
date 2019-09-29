@@ -162,7 +162,7 @@ func (h *Hub) Recv(client *Client, b []byte) {
 
 	case ClientTypeMobile:
 		var mobile *m.Mobile
-		if mobile, err = h.adaptors.Mobile.GetByAccessToken(client.Token); err != nil {
+		if mobile, err = h.adaptors.Mobile.GetById(client.Id); err != nil {
 			log.Error(err.Error())
 			return
 		}
