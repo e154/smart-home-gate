@@ -97,6 +97,8 @@ func (s *StreamProxy) auth(ctx *gin.Context) {
 		return
 	}
 
+	accessToken = strings.TrimSpace(accessToken)
+
 	data := strings.Split(accessToken, "-")
 	if len(data) != 4 {
 		ctx.AbortWithError(401, errors.New("unauthorized access"))
@@ -189,6 +191,14 @@ func (s *StreamProxy) controller(ctx *gin.Context) {
 		Header: ctx.Request.Header,
 	}
 
+	//fmt.Println("-------")
+	//fmt.Println("request")
+	//fmt.Println("-------")
+	//fmt.Println(streamRequestModel.URI)
+	//fmt.Println(streamRequestModel.Method)
+	//fmt.Println(streamRequestModel.Header)
+	//fmt.Println(string(streamRequestModel.Body))
+
 	//fmt.Printf("serverId: %v\n", serverObj.Id)
 	//fmt.Printf("streamRequestModel: %v\n", streamRequestModel)
 
@@ -223,13 +233,18 @@ func (s *StreamProxy) controller(ctx *gin.Context) {
 			log.Error(err.Error())
 		}
 
+		//fmt.Println("----------")
+		//fmt.Println("response")
+		//fmt.Println("----------")
+		//fmt.Println(r.Code)
+		//fmt.Println(r.Header)
 		//fmt.Println(string(r.Body))
 
 		for k, _ := range r.Header {
-			ctx.Set(k, r.Header.Get(k))
+			ctx.Header(k, r.Header.Get(k))
 		}
 
-		ctx.Render(r.Code, render.Data{Data: r.Body, ContentType: "application/json; charset=utf-8"})
+		ctx.Render(r.Code, render.Data{Data: r.Body})
 	})
 
 	if err != nil {
