@@ -11,7 +11,7 @@ import (
 const path = "conf/config.json"
 
 var (
-	HASH_SALT string
+	HashSalt string
 )
 
 func ReadConfig() (conf *AppConfig, err error) {
@@ -31,7 +31,7 @@ func ReadConfig() (conf *AppConfig, err error) {
 	checkEnv(conf)
 
 	//TODO fix
-	HASH_SALT = conf.HashSalt
+	HashSalt = conf.HashSalt
 
 	return
 }
@@ -67,7 +67,7 @@ func checkEnv(conf *AppConfig) {
 		conf.PgPort = pgPort
 	}
 
-	if hashSalt := os.Getenv("HASH_SALT"); hashSalt != "" {
+	if hashSalt := os.Getenv("HashSalt"); hashSalt != "" {
 		conf.HashSalt = hashSalt
 	}
 

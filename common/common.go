@@ -31,7 +31,7 @@ func RandomString(length int, charset string) string {
 func GetHashFromId(id int64, salt ...interface{}) (hash string, err error) {
 
 	hd := hashids.NewData()
-	hd.Salt = config.HASH_SALT
+	hd.Salt = config.HashSalt
 	hd.MinLength = 4
 	switch len(salt) {
 	case 1:
@@ -50,7 +50,7 @@ func GetHashFromId(id int64, salt ...interface{}) (hash string, err error) {
 func GetIdFromHash(hash string, salt ...interface{}) (id int64, err error) {
 
 	hd := hashids.NewData()
-	hd.Salt = config.HASH_SALT
+	hd.Salt = config.HashSalt
 	hd.MinLength = 4
 	switch len(salt) {
 	case 1:
