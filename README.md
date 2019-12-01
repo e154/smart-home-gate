@@ -6,7 +6,8 @@ Smart home mobile gate
 [Configurator](https://github.com/e154/smart-home-configurator/) |
 [Node](https://github.com/e154/smart-home-node/) |
 [Smart home Socket](https://github.com/e154/smart-home-socket/) |
-[Modbus device controller](https://github.com/e154/smart-home-modbus-ctrl-v1/)
+[Modbus device controller](https://github.com/e154/smart-home-modbus-ctrl-v1/) |
+[Mobile app](https://github.com/e154/smart-home-app/)
 
 [![Build Status](https://travis-ci.org/e154/smart-home-gate.svg?branch=master)](https://travis-ci.org/e154/smart-home-gate)
 ![status](https://img.shields.io/badge/status-beta-yellow.svg)
