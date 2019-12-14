@@ -73,6 +73,8 @@ func (h *Hub) AddClient(client *Client) {
 				break
 			}
 			h.Recv(client, message)
+		default:
+			log.Warningf("unknown message type(%v)", op)
 		}
 	}
 
