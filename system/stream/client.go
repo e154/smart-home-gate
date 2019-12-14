@@ -28,7 +28,12 @@ func (c *Client) Notify(t, b string) {
 
 }
 
-func (c *Client) Write(opCode int, payload []byte) error {
+func (c *Client) Write(payload []byte) (err error) {
+	c.Send <- payload
+	return nil
+}
+
+func (c *Client) write(opCode int, payload []byte) error {
 	c.Connect.SetWriteDeadline(time.Now().Add(writeWait))
 	return c.Connect.WriteMessage(opCode, payload)
 }
@@ -51,15 +56,15 @@ func (c *Client) WritePump() {
 		case message, ok := <-c.Send:
 
 			if !ok {
-				_ = c.Write(websocket.CloseMessage, []byte{})
+				_ = c.write(websocket.CloseMessage, []byte{})
 				return
 			}
-			if err := c.Write(websocket.TextMessage, message); err != nil {
+			if err := c.write(websocket.TextMessage, message); err != nil {
 				return
 			}
 
 		case <-ticker.C:
-			if err := c.Write(websocket.PingMessage, []byte{}); err != nil {
+			if err := c.write(websocket.PingMessage, []byte{}); err != nil {
 				return
 			}
 		}
@@ -67,5 +72,5 @@ func (c *Client) WritePump() {
 }
 
 func (c *Client) Close() {
-	_ = c.Write(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+	_ = c.write(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 }
