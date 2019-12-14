@@ -13,7 +13,6 @@ import (
 	"github.com/e154/smart-home-gate/system/uuid"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/render"
-	"github.com/gorilla/websocket"
 	"github.com/op/go-logging"
 	"io/ioutil"
 	"net/http"
@@ -271,7 +270,7 @@ func (g *StreamProxy) Send(command string, payload map[string]interface{}, clien
 	})
 
 	msg, _ := json.Marshal(message)
-	if err := client.Write(websocket.TextMessage, msg); err != nil {
+	if err := client.Write(msg); err != nil {
 		log.Error(err.Error())
 	}
 
