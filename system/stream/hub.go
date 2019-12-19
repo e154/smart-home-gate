@@ -46,16 +46,21 @@ func NewHub(adaptors *adaptors.Adaptors) *Hub {
 
 func (h *Hub) AddClient(client *Client) {
 
+	clientId := client.Id
+	if clientId == "" {
+		clientId = "Empty"
+	}
+
 	defer func() {
 		if ok := h.sessions[client]; ok {
 			delete(h.sessions, client)
 		}
-		log.Infof("websocket session from ip(%s) closed, id(%s)", client.Ip, client.Id)
+		log.Infof("websocket session from ip(%s) closed, id(%s)", client.Ip, clientId)
 	}()
 
 	h.sessions[client] = true
 
-	log.Infof("new websocket session established, from ip(%s), type(%v), id(%s)", client.Ip, client.Type, client.Id)
+	log.Infof("new websocket session established, from ip(%s), type(%v), id(%s)", client.Ip, client.Type, clientId)
 
 	_ = client.Connect.SetReadDeadline(time.Now().Add(pongWait))
 	client.Connect.SetPongHandler(func(string) error {
@@ -121,7 +126,11 @@ func (h *Hub) Run() {
 //
 func (h *Hub) Recv(client *Client, b []byte) {
 
-	log.Debugf("Receive message from client type(%v): %v", client.Type, client.Id)
+	clientId := client.Id
+	if clientId == "" {
+		clientId = "Empty"
+	}
+	log.Debugf("Receive message from client type(%v), clientId(%v)", client.Type, clientId)
 
 	//fmt.Printf("client(%v), message(%v)\n", client, string(b))
 
