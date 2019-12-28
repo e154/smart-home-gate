@@ -121,6 +121,7 @@ __build() {
     cp ${ROOT}/api/server/docs/swagger.yaml ${TMP_DIR}/api/server/docs/
 
     cp -r ${ROOT}/conf ${TMP_DIR}
+    cp ${ROOT}/conf/config.dev.json ${TMP_DIR}/config.json
     cp ${ROOT}/LICENSE ${TMP_DIR}
     cp ${ROOT}/README* ${TMP_DIR}
     cp ${ROOT}/contributors.txt ${TMP_DIR}
