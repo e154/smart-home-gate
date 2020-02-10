@@ -22,9 +22,11 @@ import (
 	"github.com/op/go-logging"
 	"github.com/sirupsen/logrus"
 	"os"
+	"sync"
 )
 
 type LogBackend struct {
+	sync.Mutex
 	L *logrus.Logger
 }
 
@@ -38,6 +40,9 @@ func NewLogBackend(
 }
 
 func (b *LogBackend) Log(level logging.Level, calldepth int, rec *logging.Record) (err error) {
+
+	b.Lock()
+	defer b.Unlock()
 
 	s := rec.Formatted(calldepth + 1)
 	switch level {
