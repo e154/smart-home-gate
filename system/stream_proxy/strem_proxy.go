@@ -59,6 +59,8 @@ func NewStreamProxy(httpsServer *server.Server,
 		adaptors:      adaptors,
 	}
 
+	proxy.engine.Any("/server/*any", proxy.auth, proxy.controller)
+
 	graceful.Subscribe(proxy)
 
 	return
@@ -67,7 +69,6 @@ func NewStreamProxy(httpsServer *server.Server,
 func (s *StreamProxy) Start() {
 	log.Info("start stream proxy")
 	s.streamService.Subscribe("chanel.server", s.DoAction)
-	s.engine.Any("/server/*any", s.auth, s.controller)
 }
 
 func (s *StreamProxy) Shutdown() {
