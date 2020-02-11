@@ -70,7 +70,7 @@ func (s *StreamService) UnSubscribe(command string) {
 func (w *StreamService) Ws(ctx *gin.Context) {
 
 	accessToken := ctx.Request.Header.Get("X-API-Key")
-	clientType := strings.ToLower(ctx.Request.Header.Get("X-Client-Type"))
+	clientType := ClientType(strings.ToLower(ctx.Request.Header.Get("X-Client-Type")))
 
 	var token string
 
@@ -163,8 +163,7 @@ func (w *StreamService) Ws(ctx *gin.Context) {
 	w.Hub.AddClient(client)
 }
 
-func (s *StreamService) GetClientByIdAndType(clientId,
-	clientType string) (client *Client, err error) {
+func (s *StreamService) GetClientByIdAndType(clientId string, clientType ClientType) (client *Client, err error) {
 	client, err = s.Hub.GetClientByIdAndType(clientId, clientType)
 	return
 }

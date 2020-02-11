@@ -25,18 +25,13 @@ import (
 	"time"
 )
 
-const (
-	ClientTypeServer = "server"
-	ClientTypeMobile = "mobile"
-)
-
 type Client struct {
 	Id        string
 	Connect   *websocket.Conn
 	Ip        string
 	Send      chan []byte
 	Token     string
-	Type      string
+	Type      ClientType
 	writeLock sync.Mutex
 }
 

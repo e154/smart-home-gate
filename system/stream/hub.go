@@ -115,7 +115,7 @@ func (h *Hub) AddClient(client *Client) {
 	log.Infof("websocket session closed id(%s)", client.Id)
 }
 
-func (h *Hub) GetClientByIdAndType(clientId, clientType string) (client *Client, err error) {
+func (h *Hub) GetClientByIdAndType(clientId string, clientType ClientType) (client *Client, err error) {
 
 	h.sessionsLock.Lock()
 	defer h.sessionsLock.Unlock()
