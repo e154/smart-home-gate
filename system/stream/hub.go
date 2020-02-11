@@ -168,12 +168,12 @@ func (h *Hub) Recv(client *Client, b []byte) {
 	lastMsgTime := client.getLastMsgTime()
 	client.updateLastMsgTime()
 
-	log.Debugf("Receive message from client type(%v), clientId(%v), lastMsgTime(%v)", client.Type, clientId, lastMsgTime)
-
-	if client.Type == ClientTypeMobile && lastMsgTime < 1 {
+	if client.Type == ClientTypeMobile && lastMsgTime < 0.1 {
 		log.Warningf("Rejected message from client type(%v), clientId(%v), lastMsgTime(%v)", client.Type, clientId, lastMsgTime)
 		return
 	}
+
+	//log.Debugf("Receive message from client type(%v), clientId(%v), lastMsgTime(%v)", client.Type, clientId, lastMsgTime)
 
 	//fmt.Printf("client(%v), message(%v)\n", client, string(b))
 
@@ -192,49 +192,20 @@ func (h *Hub) Recv(client *Client, b []byte) {
 				return
 			}
 		}
-		var server *m.Server
-		if server, err = h.adaptors.Server.GetById(client.Id); err != nil {
+
+		clients, err := h.GetServerClients(client)
+		if err != nil {
 			log.Error(err.Error())
-			return
 		}
-		if server.Mobiles == nil && len(server.Mobiles) == 0 {
-			log.Info("clients for message not found")
-			return
+		for _, client := range clients {
+			client.Send <- b
 		}
-		h.sessionsLock.Lock()
-		for client, _ := range h.sessions {
-			if client.Type == ClientTypeServer {
-				continue
-			}
-			for _, mobile := range server.Mobiles {
-				if mobile.Id == client.Id {
-					//log.Debugf("Resend to mobile client: %v", client.Id)
-					client.Send <- b
-				}
-			}
-		}
-		h.sessionsLock.Unlock()
 
 	case ClientTypeMobile:
-		var mobile *m.Mobile
-		if mobile, err = h.adaptors.Mobile.GetById(client.Id); err != nil {
-			log.Error(err.Error())
+		if server, err := h.GetServer(client); err == nil {
+			server.Send <- b
 			return
 		}
-		h.sessionsLock.Lock()
-		for client, _ := range h.sessions {
-			if client.Type == ClientTypeMobile {
-				continue
-			}
-			if mobile.ServerId == client.Id {
-				//log.Debugf("Resend to server: %v", client.Id)
-				client.Send <- b
-				h.sessionsLock.Unlock()
-				return
-			}
-			log.Warningf("server %s not found", mobile.ServerId)
-		}
-		h.sessionsLock.Unlock()
 	default:
 		log.Errorf("unknown client type: %v", client.Type)
 	}
@@ -262,7 +233,7 @@ func (h *Hub) Clients() (clients []*Client) {
 func (h *Hub) Subscribe(command string, f func(client *Client, msg Message)) {
 	h.subscribersLock.Lock()
 	defer h.subscribersLock.Unlock()
-	log.Infof("subscribe %s", command)
+	//log.Infof("subscribe %s", command)
 	if h.subscribers[command] != nil {
 		delete(h.subscribers, command)
 	}
@@ -272,7 +243,7 @@ func (h *Hub) Subscribe(command string, f func(client *Client, msg Message)) {
 func (h *Hub) UnSubscribe(command string) {
 	h.subscribersLock.Lock()
 	defer h.subscribersLock.Unlock()
-	log.Infof("unsubscribe %s", command)
+	//log.Infof("unsubscribe %s", command)
 	if h.subscribers[command] != nil {
 		delete(h.subscribers, command)
 	}
@@ -287,4 +258,65 @@ func (h *Hub) GetCommandFromSubscribers(cmd string) func(client *Client, msg Mes
 		}
 	}
 	return nil
+}
+
+func (h *Hub) GetServer(cli *Client) (server *Client, err error) {
+
+	if cli.server != nil {
+		//log.Debugf("mobile --> server(%v)", mobile.ServerId)
+		server = cli.server
+		return
+	}
+
+	var mobile *m.Mobile
+	if mobile, err = h.adaptors.Mobile.GetById(cli.Id); err != nil {
+		log.Error(err.Error())
+		return
+	}
+	h.sessionsLock.Lock()
+	defer h.sessionsLock.Unlock()
+
+	for client, _ := range h.sessions {
+		if client.Type == ClientTypeMobile {
+			continue
+		}
+		if mobile.ServerId == client.Id {
+			log.Debugf("mobile --> server(%v)", mobile.ServerId)
+			server = client
+			cli.server = client
+			return
+		}
+		log.Warningf("server %s not found", mobile.ServerId)
+	}
+
+	return
+}
+
+func (h *Hub) GetServerClients(cli *Client) (clients []*Client, err error) {
+
+	var server *m.Server
+	if server, err = h.adaptors.Server.GetById(cli.Id); err != nil {
+		log.Error(err.Error())
+		return
+	}
+	if server.Mobiles == nil && len(server.Mobiles) == 0 {
+		log.Info("clients for message not found")
+		return
+	}
+	h.sessionsLock.Lock()
+	defer h.sessionsLock.Unlock()
+
+	for client, _ := range h.sessions {
+		if client.Type == ClientTypeServer {
+			continue
+		}
+		for _, mobile := range server.Mobiles {
+			if mobile.Id == client.Id {
+				log.Debugf("server(%v) --> mobiles", server.Id)
+				clients = append(clients, client)
+			}
+		}
+	}
+
+	return
 }

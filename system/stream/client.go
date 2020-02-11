@@ -35,6 +35,7 @@ type Client struct {
 	writeLock   sync.Mutex
 	lastMsgTime time.Time
 	connected   time.Time
+	server      *Client
 }
 
 func (c *Client) Notify(t, b string) {
@@ -101,4 +102,8 @@ func (c *Client) getLastMsgTime() float64 {
 
 func (c *Client) updateLastMsgTime() {
 	c.lastMsgTime = time.Now()
+}
+
+func (c *Client) UpdateServer(server *Client) {
+	c.server = server
 }
