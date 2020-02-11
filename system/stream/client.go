@@ -21,6 +21,7 @@ package stream
 import (
 	"encoding/json"
 	"github.com/gorilla/websocket"
+	"sync"
 	"time"
 )
 
@@ -30,12 +31,13 @@ const (
 )
 
 type Client struct {
-	Id      string
-	Connect *websocket.Conn
-	Ip      string
-	Send    chan []byte
-	Token   string
-	Type    string
+	Id        string
+	Connect   *websocket.Conn
+	Ip        string
+	Send      chan []byte
+	Token     string
+	Type      string
+	writeLock sync.Mutex
 }
 
 func (c *Client) Notify(t, b string) {
@@ -51,9 +53,12 @@ func (c *Client) Write(payload []byte) (err error) {
 	return nil
 }
 
-func (c *Client) write(opCode int, payload []byte) error {
+func (c *Client) write(opCode int, payload []byte) (err error){
+	c.writeLock.Lock()
 	c.Connect.SetWriteDeadline(time.Now().Add(writeWait))
-	return c.Connect.WriteMessage(opCode, payload)
+	err = c.Connect.WriteMessage(opCode, payload)
+	c.writeLock.Unlock()
+	return
 }
 
 // send message to client
