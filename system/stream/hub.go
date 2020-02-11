@@ -113,6 +113,9 @@ func (h *Hub) AddClient(client *Client) {
 
 func (h *Hub) GetClientByIdAndType(clientId, clientType string) (client *Client, err error) {
 
+	h.sessionsLock.Lock()
+	defer h.sessionsLock.Unlock()
+	
 	for cli, _ := range h.sessions {
 		if cli.Id == clientId && cli.Type == clientType {
 			client = cli

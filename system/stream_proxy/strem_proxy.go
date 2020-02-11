@@ -262,6 +262,11 @@ func (s *StreamProxy) controller(ctx *gin.Context) {
 			ctx.Header(k, r.Header.Get(k))
 		}
 
+		if ctx.IsAborted() {
+			log.Warning("context is aborted")
+			return
+		}
+
 		ctx.Render(r.Code, render.Data{Data: r.Body})
 	})
 
