@@ -21,10 +21,9 @@ package stream
 import (
 	"github.com/e154/smart-home-gate/adaptors"
 	m "github.com/e154/smart-home-gate/models"
+	"github.com/e154/smart-home-gate/system/graceful_service"
 	"github.com/gorilla/websocket"
 	"io/ioutil"
-	"os"
-	"os/signal"
 	"sync"
 	"time"
 )
@@ -39,28 +38,33 @@ const (
 type Hub struct {
 	adaptors        *adaptors.Adaptors
 	broadcast       chan []byte
-	interrupt       chan os.Signal
+	interrupt       chan struct{}
 	sessionsLock    sync.Mutex
 	sessions        map[*Client]bool
 	subscribersLock sync.Mutex
 	subscribers     map[string]func(client *Client, msg Message)
 }
 
-func NewHub(adaptors *adaptors.Adaptors) *Hub {
-
-	interrupt := make(chan os.Signal, 1)
-	signal.Notify(interrupt, os.Interrupt)
+func NewHub(adaptors *adaptors.Adaptors,
+	graceful_service *graceful_service.GracefulService) *Hub {
 
 	hub := &Hub{
 		adaptors:    adaptors,
 		sessions:    make(map[*Client]bool),
 		broadcast:   make(chan []byte, maxMessageSize),
 		subscribers: make(map[string]func(client *Client, msg Message)),
-		interrupt:   interrupt,
+		interrupt:   make(chan struct{}, 1),
 	}
+
+	graceful_service.Subscribe(hub)
+
 	go hub.Run()
 
 	return hub
+}
+
+func (h *Hub) Shutdown() {
+	h.interrupt <- struct{}{}
 }
 
 func (h *Hub) AddClient(client *Client) {
@@ -115,7 +119,7 @@ func (h *Hub) GetClientByIdAndType(clientId, clientType string) (client *Client,
 
 	h.sessionsLock.Lock()
 	defer h.sessionsLock.Unlock()
-	
+
 	for cli, _ := range h.sessions {
 		if cli.Id == clientId && cli.Type == clientType {
 			client = cli
