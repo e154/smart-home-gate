@@ -1,3 +1,21 @@
+// This file is part of the Smart Home
+// Program complex distribution https://github.com/e154/smart-home
+// Copyright (C) 2016-2020, Filippov Alex
+//
+// This library is free software: you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Library General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.  If not, see
+// <https://www.gnu.org/licenses/>.
+
 package stream_proxy
 
 import (
@@ -41,6 +59,8 @@ func NewStreamProxy(httpsServer *server.Server,
 		adaptors:      adaptors,
 	}
 
+	proxy.engine.Any("/server/*any", proxy.auth, proxy.controller)
+
 	graceful.Subscribe(proxy)
 
 	return
@@ -49,7 +69,6 @@ func NewStreamProxy(httpsServer *server.Server,
 func (s *StreamProxy) Start() {
 	log.Info("start stream proxy")
 	s.streamService.Subscribe("chanel.server", s.DoAction)
-	s.engine.Any("/server/*any", s.auth, s.controller)
 }
 
 func (s *StreamProxy) Shutdown() {
@@ -243,6 +262,11 @@ func (s *StreamProxy) controller(ctx *gin.Context) {
 			ctx.Header(k, r.Header.Get(k))
 		}
 
+		if ctx.IsAborted() {
+			log.Warning("context is aborted")
+			return
+		}
+
 		ctx.Render(r.Code, render.Data{Data: r.Body})
 	})
 
@@ -276,10 +300,14 @@ func (g *StreamProxy) Send(command string, payload map[string]interface{}, clien
 
 	select {
 	case <-time.After(5 * time.Second):
-		ctx.AbortWithStatus(http.StatusRequestTimeout)
+		if !ctx.IsAborted() {
+			ctx.AbortWithStatus(http.StatusRequestTimeout)
+		}
 	case <-done:
 	case <-ctx.Done():
-		ctx.AbortWithStatus(http.StatusRequestTimeout)
+		if !ctx.IsAborted() {
+			ctx.AbortWithStatus(http.StatusRequestTimeout)
+		}
 	}
 
 	return

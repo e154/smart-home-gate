@@ -1,12 +1,29 @@
+// This file is part of the Smart Home
+// Program complex distribution https://github.com/e154/smart-home
+// Copyright (C) 2016-2020, Filippov Alex
+//
+// This library is free software: you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Library General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.  If not, see
+// <https://www.gnu.org/licenses/>.
+
 package stream
 
 import (
 	"github.com/e154/smart-home-gate/adaptors"
 	m "github.com/e154/smart-home-gate/models"
+	"github.com/e154/smart-home-gate/system/graceful_service"
 	"github.com/gorilla/websocket"
 	"io/ioutil"
-	"os"
-	"os/signal"
 	"sync"
 	"time"
 )
@@ -19,29 +36,35 @@ const (
 )
 
 type Hub struct {
-	adaptors    *adaptors.Adaptors
-	sessions    map[*Client]bool
-	subscribers map[string]func(client *Client, msg Message)
-	sync.Mutex
-	broadcast chan []byte
-	interrupt chan os.Signal
+	adaptors        *adaptors.Adaptors
+	broadcast       chan []byte
+	interrupt       chan struct{}
+	sessionsLock    sync.Mutex
+	sessions        map[*Client]bool
+	subscribersLock sync.Mutex
+	subscribers     map[string]func(client *Client, msg Message)
 }
 
-func NewHub(adaptors *adaptors.Adaptors) *Hub {
-
-	interrupt := make(chan os.Signal, 1)
-	signal.Notify(interrupt, os.Interrupt)
+func NewHub(adaptors *adaptors.Adaptors,
+	graceful_service *graceful_service.GracefulService) *Hub {
 
 	hub := &Hub{
 		adaptors:    adaptors,
 		sessions:    make(map[*Client]bool),
 		broadcast:   make(chan []byte, maxMessageSize),
 		subscribers: make(map[string]func(client *Client, msg Message)),
-		interrupt:   interrupt,
+		interrupt:   make(chan struct{}, 1),
 	}
+
+	graceful_service.Subscribe(hub)
+
 	go hub.Run()
 
 	return hub
+}
+
+func (h *Hub) Shutdown() {
+	h.interrupt <- struct{}{}
 }
 
 func (h *Hub) AddClient(client *Client) {
@@ -52,13 +75,17 @@ func (h *Hub) AddClient(client *Client) {
 	}
 
 	defer func() {
+		h.sessionsLock.Lock()
 		if ok := h.sessions[client]; ok {
 			delete(h.sessions, client)
 		}
+		h.sessionsLock.Unlock()
 		log.Infof("websocket session from ip(%s) closed, id(%s)", client.Ip, clientId)
 	}()
 
+	h.sessionsLock.Lock()
 	h.sessions[client] = true
+	h.sessionsLock.Unlock()
 
 	log.Infof("new websocket session established, from ip(%s), type(%v), id(%s)", client.Ip, client.Type, clientId)
 
@@ -88,7 +115,10 @@ func (h *Hub) AddClient(client *Client) {
 	log.Infof("websocket session closed id(%s)", client.Id)
 }
 
-func (h *Hub) GetClientByIdAndType(clientId, clientType string) (client *Client, err error) {
+func (h *Hub) GetClientByIdAndType(clientId string, clientType ClientType) (client *Client, err error) {
+
+	h.sessionsLock.Lock()
+	defer h.sessionsLock.Unlock()
 
 	for cli, _ := range h.sessions {
 		if cli.Id == clientId && cli.Type == clientType {
@@ -105,15 +135,19 @@ func (h *Hub) Run() {
 	for {
 		select {
 		case m := <-h.broadcast:
+			h.sessionsLock.Lock()
 			for client := range h.sessions {
 				client.Send <- m
 			}
+			h.sessionsLock.Unlock()
 		case <-h.interrupt:
 			//fmt.Println("Close websocket client session")
+			h.sessionsLock.Lock()
 			for client := range h.sessions {
 				client.Close()
 				delete(h.sessions, client)
 			}
+			h.sessionsLock.Unlock()
 		}
 
 	}
@@ -130,7 +164,16 @@ func (h *Hub) Recv(client *Client, b []byte) {
 	if clientId == "" {
 		clientId = "Empty"
 	}
-	log.Debugf("Receive message from client type(%v), clientId(%v)", client.Type, clientId)
+
+	lastMsgTime := client.getLastMsgTime()
+	client.updateLastMsgTime()
+
+	log.Debugf("Receive message from client type(%v), clientId(%v), lastMsgTime(%v)", client.Type, clientId, lastMsgTime)
+
+	if client.Type == ClientTypeMobile && lastMsgTime < 1 {
+		log.Warningf("Rejected message from client type(%v), clientId(%v), lastMsgTime(%v)", client.Type, clientId, lastMsgTime)
+		return
+	}
 
 	//fmt.Printf("client(%v), message(%v)\n", client, string(b))
 
@@ -144,12 +187,9 @@ func (h *Hub) Recv(client *Client, b []byte) {
 	case ClientTypeServer:
 		switch msg.Command {
 		default:
-			for command, f := range h.subscribers {
-
-				if msg.Command == command {
-					f(client, msg)
-					return
-				}
+			if f := h.GetCommandFromSubscribers(msg.Command); f != nil {
+				f(client, msg)
+				return
 			}
 		}
 		var server *m.Server
@@ -161,17 +201,19 @@ func (h *Hub) Recv(client *Client, b []byte) {
 			log.Info("clients for message not found")
 			return
 		}
+		h.sessionsLock.Lock()
 		for client, _ := range h.sessions {
 			if client.Type == ClientTypeServer {
 				continue
 			}
 			for _, mobile := range server.Mobiles {
 				if mobile.Id == client.Id {
-					log.Debugf("Resend to mobile client: %v", client.Id)
+					//log.Debugf("Resend to mobile client: %v", client.Id)
 					client.Send <- b
 				}
 			}
 		}
+		h.sessionsLock.Unlock()
 
 	case ClientTypeMobile:
 		var mobile *m.Mobile
@@ -179,17 +221,20 @@ func (h *Hub) Recv(client *Client, b []byte) {
 			log.Error(err.Error())
 			return
 		}
+		h.sessionsLock.Lock()
 		for client, _ := range h.sessions {
 			if client.Type == ClientTypeMobile {
 				continue
 			}
 			if mobile.ServerId == client.Id {
-				log.Debugf("Resend to server: %v", client.Id)
+				//log.Debugf("Resend to server: %v", client.Id)
 				client.Send <- b
+				h.sessionsLock.Unlock()
 				return
 			}
-			log.Warningf("server %s not found", mobile.ServerId	)
+			log.Warningf("server %s not found", mobile.ServerId)
 		}
+		h.sessionsLock.Unlock()
 	default:
 		log.Errorf("unknown client type: %v", client.Type)
 	}
@@ -200,13 +245,12 @@ func (h *Hub) Send(client *Client, message []byte) {
 }
 
 func (h *Hub) Broadcast(message []byte) {
-	h.Lock()
 	h.broadcast <- message
-	h.Unlock()
 }
 
 func (h *Hub) Clients() (clients []*Client) {
-
+	h.sessionsLock.Lock()
+	defer h.sessionsLock.Unlock()
 	clients = []*Client{}
 	for c := range h.sessions {
 		clients = append(clients, c)
@@ -216,6 +260,8 @@ func (h *Hub) Clients() (clients []*Client) {
 }
 
 func (h *Hub) Subscribe(command string, f func(client *Client, msg Message)) {
+	h.subscribersLock.Lock()
+	defer h.subscribersLock.Unlock()
 	log.Infof("subscribe %s", command)
 	if h.subscribers[command] != nil {
 		delete(h.subscribers, command)
@@ -224,8 +270,21 @@ func (h *Hub) Subscribe(command string, f func(client *Client, msg Message)) {
 }
 
 func (h *Hub) UnSubscribe(command string) {
+	h.subscribersLock.Lock()
+	defer h.subscribersLock.Unlock()
 	log.Infof("unsubscribe %s", command)
 	if h.subscribers[command] != nil {
 		delete(h.subscribers, command)
 	}
+}
+
+func (h *Hub) GetCommandFromSubscribers(cmd string) func(client *Client, msg Message) {
+	h.subscribersLock.Lock()
+	defer h.subscribersLock.Unlock()
+	for command, f := range h.subscribers {
+		if cmd == command {
+			return f
+		}
+	}
+	return nil
 }
