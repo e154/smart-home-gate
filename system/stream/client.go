@@ -26,13 +26,15 @@ import (
 )
 
 type Client struct {
-	Id        string
-	Connect   *websocket.Conn
-	Ip        string
-	Send      chan []byte
-	Token     string
-	Type      ClientType
-	writeLock sync.Mutex
+	Id          string
+	Connect     *websocket.Conn
+	Ip          string
+	Send        chan []byte
+	Token       string
+	Type        ClientType
+	writeLock   sync.Mutex
+	lastMsgTime time.Time
+	connected   time.Time
 }
 
 func (c *Client) Notify(t, b string) {
@@ -48,7 +50,7 @@ func (c *Client) Write(payload []byte) (err error) {
 	return nil
 }
 
-func (c *Client) write(opCode int, payload []byte) (err error){
+func (c *Client) write(opCode int, payload []byte) (err error) {
 	c.writeLock.Lock()
 	c.Connect.SetWriteDeadline(time.Now().Add(writeWait))
 	err = c.Connect.WriteMessage(opCode, payload)
@@ -91,4 +93,12 @@ func (c *Client) WritePump() {
 
 func (c *Client) Close() {
 	_ = c.write(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+}
+
+func (c *Client) getLastMsgTime() float64 {
+	return time.Since(c.lastMsgTime).Seconds()
+}
+
+func (c *Client) updateLastMsgTime() {
+	c.lastMsgTime = time.Now()
 }

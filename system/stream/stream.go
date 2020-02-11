@@ -29,6 +29,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 var (
@@ -151,12 +152,14 @@ func (w *StreamService) Ws(ctx *gin.Context) {
 	}
 
 	client := &Client{
-		Id:      clientId,
-		Connect: conn,
-		Ip:      ctx.ClientIP(),
-		Send:    make(chan []byte),
-		Token:   token,
-		Type:    clientType,
+		Id:          clientId,
+		Connect:     conn,
+		Ip:          ctx.ClientIP(),
+		Send:        make(chan []byte),
+		Token:       token,
+		Type:        clientType,
+		connected:   time.Now(),
+		lastMsgTime: time.Now(),
 	}
 
 	go client.WritePump()

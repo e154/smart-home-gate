@@ -164,7 +164,16 @@ func (h *Hub) Recv(client *Client, b []byte) {
 	if clientId == "" {
 		clientId = "Empty"
 	}
-	log.Debugf("Receive message from client type(%v), clientId(%v)", client.Type, clientId)
+
+	lastMsgTime := client.getLastMsgTime()
+	client.updateLastMsgTime()
+
+	log.Debugf("Receive message from client type(%v), clientId(%v), lastMsgTime(%v)", client.Type, clientId, lastMsgTime)
+
+	if client.Type == ClientTypeMobile && lastMsgTime < 1 {
+		log.Warningf("Rejected message from client type(%v), clientId(%v), lastMsgTime(%v)", client.Type, clientId, lastMsgTime)
+		return
+	}
 
 	//fmt.Printf("client(%v), message(%v)\n", client, string(b))
 
@@ -199,7 +208,7 @@ func (h *Hub) Recv(client *Client, b []byte) {
 			}
 			for _, mobile := range server.Mobiles {
 				if mobile.Id == client.Id {
-					log.Debugf("Resend to mobile client: %v", client.Id)
+					//log.Debugf("Resend to mobile client: %v", client.Id)
 					client.Send <- b
 				}
 			}
@@ -218,7 +227,7 @@ func (h *Hub) Recv(client *Client, b []byte) {
 				continue
 			}
 			if mobile.ServerId == client.Id {
-				log.Debugf("Resend to server: %v", client.Id)
+				//log.Debugf("Resend to server: %v", client.Id)
 				client.Send <- b
 				h.sessionsLock.Unlock()
 				return
