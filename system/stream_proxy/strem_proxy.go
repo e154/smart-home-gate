@@ -299,7 +299,7 @@ func (g *StreamProxy) Send(command string, payload map[string]interface{}, clien
 	}
 
 	select {
-	case <-time.After(5 * time.Second):
+	case <-time.After(30 * time.Second):
 		if !ctx.IsAborted() {
 			ctx.AbortWithStatus(http.StatusRequestTimeout)
 		}

@@ -28,6 +28,7 @@ import (
 	"github.com/e154/smart-home-gate/system/dig"
 	"github.com/e154/smart-home-gate/system/graceful_service"
 	"github.com/e154/smart-home-gate/system/logging"
+	"github.com/e154/smart-home-gate/system/metrics"
 	"github.com/e154/smart-home-gate/system/migrations"
 	"github.com/e154/smart-home-gate/system/orm"
 	"github.com/e154/smart-home-gate/system/stream"
@@ -56,6 +57,8 @@ func BuildContainer() (container *dig.Container) {
 	container.Provide(endpoint.NewEndpoint)
 	container.Provide(websocket.NewWebSocket)
 	container.Provide(stream_proxy.NewStreamProxy)
+	container.Provide(metrics.NewMetricConfig)
+	container.Provide(metrics.NewMetricServer)
 
 	return
 }

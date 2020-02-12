@@ -19,6 +19,7 @@
 package stream
 
 import (
+	"errors"
 	"github.com/e154/smart-home-gate/adaptors"
 	m "github.com/e154/smart-home-gate/models"
 	"github.com/e154/smart-home-gate/system/graceful_service"
@@ -36,11 +37,13 @@ const (
 )
 
 type Hub struct {
-	adaptors        *adaptors.Adaptors
-	broadcast       chan []byte
-	interrupt       chan struct{}
-	sessionsLock    sync.Mutex
-	sessions        map[*Client]bool
+	adaptors *adaptors.Adaptors
+	//broadcast    chan []byte
+	interrupt    chan struct{}
+	sessionsLock sync.Mutex
+	//sessions        map[*Client]bool
+	servers         map[string]*Client
+	mobiles         map[string]*Client
 	subscribersLock sync.Mutex
 	subscribers     map[string]func(client *Client, msg Message)
 }
@@ -49,9 +52,11 @@ func NewHub(adaptors *adaptors.Adaptors,
 	graceful_service *graceful_service.GracefulService) *Hub {
 
 	hub := &Hub{
-		adaptors:    adaptors,
-		sessions:    make(map[*Client]bool),
-		broadcast:   make(chan []byte, maxMessageSize),
+		adaptors: adaptors,
+		//sessions:    make(map[*Client]bool),
+		servers: make(map[string]*Client),
+		mobiles: make(map[string]*Client),
+		//broadcast:   make(chan []byte, maxMessageSize),
 		subscribers: make(map[string]func(client *Client, msg Message)),
 		interrupt:   make(chan struct{}, 1),
 	}
@@ -76,15 +81,19 @@ func (h *Hub) AddClient(client *Client) {
 
 	defer func() {
 		h.sessionsLock.Lock()
-		if ok := h.sessions[client]; ok {
-			delete(h.sessions, client)
+		if _, ok := h.servers[client.Id]; ok {
+			delete(h.servers, client.Id)
 		}
 		h.sessionsLock.Unlock()
 		log.Infof("websocket session from ip(%s) closed, id(%s)", client.Ip, clientId)
 	}()
 
 	h.sessionsLock.Lock()
-	h.sessions[client] = true
+	if client.Type == ClientTypeServer {
+		h.servers[client.Id] = client
+	} else {
+		h.mobiles[client.Id] = client
+	}
 	h.sessionsLock.Unlock()
 
 	log.Infof("new websocket session established, from ip(%s), type(%v), id(%s)", client.Ip, client.Type, clientId)
@@ -100,6 +109,7 @@ func (h *Hub) AddClient(client *Client) {
 			log.Debug(err.Error())
 			break
 		}
+		client.receivedInc()
 		switch op {
 		case websocket.TextMessage:
 			message, err := ioutil.ReadAll(r)
@@ -115,16 +125,14 @@ func (h *Hub) AddClient(client *Client) {
 	log.Infof("websocket session closed id(%s)", client.Id)
 }
 
-func (h *Hub) GetClientByIdAndType(clientId string, clientType ClientType) (client *Client, err error) {
+func (h *Hub) GetClientServer(clientId string) (client *Client, err error) {
 
 	h.sessionsLock.Lock()
 	defer h.sessionsLock.Unlock()
 
-	for cli, _ := range h.sessions {
-		if cli.Id == clientId && cli.Type == clientType {
-			client = cli
-			return
-		}
+	var ok bool
+	if client, ok = h.servers[clientId]; !ok {
+		err = errors.New("not found")
 	}
 
 	return
@@ -134,18 +142,15 @@ func (h *Hub) Run() {
 
 	for {
 		select {
-		case m := <-h.broadcast:
-			h.sessionsLock.Lock()
-			for client := range h.sessions {
-				client.Send <- m
-			}
-			h.sessionsLock.Unlock()
 		case <-h.interrupt:
-			//fmt.Println("Close websocket client session")
 			h.sessionsLock.Lock()
-			for client := range h.sessions {
+			for _, client := range h.servers {
 				client.Close()
-				delete(h.sessions, client)
+				delete(h.servers, client.Id)
+			}
+			for _, mobile := range h.mobiles {
+				mobile.Close()
+				delete(h.servers, mobile.Id)
 			}
 			h.sessionsLock.Unlock()
 		}
@@ -168,12 +173,12 @@ func (h *Hub) Recv(client *Client, b []byte) {
 	lastMsgTime := client.getLastMsgTime()
 	client.updateLastMsgTime()
 
-	log.Debugf("Receive message from client type(%v), clientId(%v), lastMsgTime(%v)", client.Type, clientId, lastMsgTime)
-
-	if client.Type == ClientTypeMobile && lastMsgTime < 1 {
+	if client.Type == ClientTypeMobile && lastMsgTime < 0.1 {
 		log.Warningf("Rejected message from client type(%v), clientId(%v), lastMsgTime(%v)", client.Type, clientId, lastMsgTime)
 		return
 	}
+
+	//log.Debugf("Receive message from client type(%v), clientId(%v), lastMsgTime(%v)", client.Type, clientId, lastMsgTime)
 
 	//fmt.Printf("client(%v), message(%v)\n", client, string(b))
 
@@ -192,49 +197,20 @@ func (h *Hub) Recv(client *Client, b []byte) {
 				return
 			}
 		}
-		var server *m.Server
-		if server, err = h.adaptors.Server.GetById(client.Id); err != nil {
+
+		clients, err := h.GetServerClients(client)
+		if err != nil {
 			log.Error(err.Error())
-			return
 		}
-		if server.Mobiles == nil && len(server.Mobiles) == 0 {
-			log.Info("clients for message not found")
-			return
+		for _, client := range clients {
+			client.Send <- b
 		}
-		h.sessionsLock.Lock()
-		for client, _ := range h.sessions {
-			if client.Type == ClientTypeServer {
-				continue
-			}
-			for _, mobile := range server.Mobiles {
-				if mobile.Id == client.Id {
-					//log.Debugf("Resend to mobile client: %v", client.Id)
-					client.Send <- b
-				}
-			}
-		}
-		h.sessionsLock.Unlock()
 
 	case ClientTypeMobile:
-		var mobile *m.Mobile
-		if mobile, err = h.adaptors.Mobile.GetById(client.Id); err != nil {
-			log.Error(err.Error())
+		if server, err := h.GetServer(client); err == nil {
+			server.Send <- b
 			return
 		}
-		h.sessionsLock.Lock()
-		for client, _ := range h.sessions {
-			if client.Type == ClientTypeMobile {
-				continue
-			}
-			if mobile.ServerId == client.Id {
-				//log.Debugf("Resend to server: %v", client.Id)
-				client.Send <- b
-				h.sessionsLock.Unlock()
-				return
-			}
-			log.Warningf("server %s not found", mobile.ServerId)
-		}
-		h.sessionsLock.Unlock()
 	default:
 		log.Errorf("unknown client type: %v", client.Type)
 	}
@@ -244,25 +220,10 @@ func (h *Hub) Send(client *Client, message []byte) {
 	client.Send <- message
 }
 
-func (h *Hub) Broadcast(message []byte) {
-	h.broadcast <- message
-}
-
-func (h *Hub) Clients() (clients []*Client) {
-	h.sessionsLock.Lock()
-	defer h.sessionsLock.Unlock()
-	clients = []*Client{}
-	for c := range h.sessions {
-		clients = append(clients, c)
-	}
-
-	return
-}
-
 func (h *Hub) Subscribe(command string, f func(client *Client, msg Message)) {
 	h.subscribersLock.Lock()
 	defer h.subscribersLock.Unlock()
-	log.Infof("subscribe %s", command)
+	//log.Infof("subscribe %s", command)
 	if h.subscribers[command] != nil {
 		delete(h.subscribers, command)
 	}
@@ -272,7 +233,7 @@ func (h *Hub) Subscribe(command string, f func(client *Client, msg Message)) {
 func (h *Hub) UnSubscribe(command string) {
 	h.subscribersLock.Lock()
 	defer h.subscribersLock.Unlock()
-	log.Infof("unsubscribe %s", command)
+	//log.Infof("unsubscribe %s", command)
 	if h.subscribers[command] != nil {
 		delete(h.subscribers, command)
 	}
@@ -287,4 +248,49 @@ func (h *Hub) GetCommandFromSubscribers(cmd string) func(client *Client, msg Mes
 		}
 	}
 	return nil
+}
+
+func (h *Hub) GetServer(cli *Client) (server *Client, err error) {
+
+	var mobile *m.Mobile
+	if mobile, err = h.adaptors.Mobile.GetById(cli.Id); err != nil {
+		log.Error(err.Error())
+		return
+	}
+	h.sessionsLock.Lock()
+	defer h.sessionsLock.Unlock()
+
+	var ok bool
+	if server, ok = h.servers[mobile.ServerId]; ok {
+		log.Debugf("mobile --> server(%v)", mobile.ServerId)
+	} else {
+		log.Warningf("server %s not found", mobile.ServerId)
+		err = errors.New("not found")
+	}
+
+	return
+}
+
+func (h *Hub) GetServerClients(cli *Client) (clients []*Client, err error) {
+
+	var server *m.Server
+	if server, err = h.adaptors.Server.GetById(cli.Id); err != nil {
+		log.Error(err.Error())
+		return
+	}
+	if server.Mobiles == nil && len(server.Mobiles) == 0 {
+		log.Info("clients for message not found")
+		return
+	}
+	h.sessionsLock.Lock()
+	defer h.sessionsLock.Unlock()
+
+	for _, mobile := range server.Mobiles {
+		if client, ok := h.mobiles[mobile.Id]; ok {
+			log.Debugf("server(%v) --> mobile(%v)", server.Id, mobile.Id)
+			clients = append(clients, client)
+		}
+	}
+
+	return
 }

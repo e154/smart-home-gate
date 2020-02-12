@@ -18,40 +18,12 @@
   revision = "de5bf2ad457846296e2031421a34e2568e304e35"
 
 [[projects]]
-  digest = "1:320e7ead93de9fd2b0e59b50fd92a4d50c1f8ab455d96bc2eb083267453a9709"
-  name = "github.com/asaskevich/govalidator"
-  packages = ["."]
+  digest = "1:d6afaeed1502aa28e80a4ed0981d570ad91b2579193404256ce672ed0a609e0d"
+  name = "github.com/beorn7/perks"
+  packages = ["quantile"]
   pruneopts = "UT"
-  revision = "ccb8e960c48f04d6935e72476ae4a51028f9e22f"
-  version = "v9"
-
-[[projects]]
-  digest = "1:10271edd6716159a69e0ebbaaa7b6254bbcccb78af9a2144396e71b382cb9d0b"
-  name = "github.com/astaxie/beego"
-  packages = [
-    "config",
-    "utils",
-    "validation",
-  ]
-  pruneopts = "UT"
-  revision = "1b6edafc96ad27b6515fafeccd7339dda3e997b1"
-  version = "v1.11.1"
-
-[[projects]]
-  digest = "1:af43bdaaf86655a2343f113e9b293bbc16b12099eaeb223982bbe4d4c22ba14d"
-  name = "github.com/fatih/structs"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "4966fc68f5b7593aafa6cbbba2d65ec6e1416047"
-  version = "v1.1.0"
-
-[[projects]]
-  branch = "master"
-  digest = "1:cdec73a55fb05ff51e2a01d12efe7b773083aaad3a6d41d747a4f0a742d61a9d"
-  name = "github.com/fiam/gounidecode"
-  packages = ["unidecode"]
-  pruneopts = "UT"
-  revision = "8deddbd03fec2c28969266e52f27b6fb22be1823"
+  revision = "37c8de3658fcb183f997c4e13e8337516ab753e6"
+  version = "v1.0.1"
 
 [[projects]]
   digest = "1:3ee1d175a75b911a659fbd860060874c4f503e793c5870d13e5a0ede529a63cf"
@@ -75,25 +47,6 @@
   version = "v1.4.0"
 
 [[projects]]
-  digest = "1:9ae75184aad2327e2a0f20e5940bb11fba9a383b091d34fe438a2802a8236cd4"
-  name = "github.com/go-openapi/analysis"
-  packages = [
-    ".",
-    "internal",
-  ]
-  pruneopts = "UT"
-  revision = "147e766af12c74c10c633436007317dbcd9abb0b"
-  version = "v0.19.2"
-
-[[projects]]
-  branch = "master"
-  digest = "1:dd9d7a334e7d246a8501ac0cf5d408024c91ff8b8308930cd98916629970da97"
-  name = "github.com/go-openapi/errors"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "9b273e805998abc751853b4e1574d66e5df888b4"
-
-[[projects]]
   digest = "1:3199d542cd80a8505e4cd90bb6c7d0bca8a67948834239053c78f9e20b8caa5f"
   name = "github.com/go-openapi/jsonpointer"
   packages = ["."]
@@ -110,36 +63,12 @@
   version = "v0.19.2"
 
 [[projects]]
-  digest = "1:cdace6771905e7cd0656263b5132f012a668c5bf937a6bdabf4c37bc8ed3addf"
-  name = "github.com/go-openapi/loads"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "8548893a17237be4a5b2f74773f23002f4179bbe"
-  version = "v0.19.2"
-
-[[projects]]
-  digest = "1:3c3c877cd1d4c069e7e9fc088a40460df88247a0467d583cd26d613c9e983584"
-  name = "github.com/go-openapi/runtime"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "1c4afa5263ac1b091911b4f2440b6ae406fc31e1"
-  version = "v0.19.2"
-
-[[projects]]
   digest = "1:b1f97d0d316f90c2059f7bfee14855c314d65834a3b93f02856e01c1fb8fbebe"
   name = "github.com/go-openapi/spec"
   packages = ["."]
   pruneopts = "UT"
   revision = "bdfd7e07daecc404d77868a88b2364d0aed0ee5a"
   version = "v0.19.2"
-
-[[projects]]
-  branch = "master"
-  digest = "1:60e14b70fbc3b2814e48562179462d7f633fc8733b6ee8e57f576801cd863f57"
-  name = "github.com/go-openapi/strfmt"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "432db8fbcb18bf11f72ca9538e07943e45be4d9f"
 
 [[projects]]
   branch = "master"
@@ -150,25 +79,15 @@
   revision = "7e8dd5ceab83c86d17bc967d09e195414fe2b47e"
 
 [[projects]]
-  branch = "master"
-  digest = "1:9d2bd059a75e4ac3983cc93fe013dbc7f789fccb996171094279458b15329842"
-  name = "github.com/go-openapi/validate"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "6405b9095e4c96aabb45856da08a9323d50d9336"
-
-[[projects]]
-  digest = "1:586ea76dbd0374d6fb649a91d70d652b7fe0ccffb8910a77468e7702e7901f3d"
-  name = "github.com/go-stack/stack"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "2fee6af1a9795aafbe0253a0cfbdf668e1fb8a9a"
-  version = "v1.8.0"
-
-[[projects]]
-  digest = "1:318f1c959a8a740366fce4b1e1eb2fd914036b4af58fbd0a003349b305f118ad"
+  digest = "1:239c4c7fd2159585454003d9be7207167970194216193a8a210b8d29576f19c9"
   name = "github.com/golang/protobuf"
-  packages = ["proto"]
+  packages = [
+    "proto",
+    "ptypes",
+    "ptypes/any",
+    "ptypes/duration",
+    "ptypes/timestamp",
+  ]
   pruneopts = "UT"
   revision = "b5d812f8a3706043e23a9cd5babf2e5423744d30"
   version = "v1.3.1"
@@ -180,14 +99,6 @@
   pruneopts = "UT"
   revision = "66b9c49e59c6c48f0ffce28c2d8b8a5678502c6d"
   version = "v1.4.0"
-
-[[projects]]
-  branch = "master"
-  digest = "1:be3bd107094de27145a9a92e9e5e2b3eb03d3d92a5dec68da31b8eba4e4c6ae2"
-  name = "github.com/iancoleman/strcase"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "e506e3ef73653e84c592ba44aab577a46678f68c"
 
 [[projects]]
   branch = "master"
@@ -262,12 +173,12 @@
   version = "v0.0.8"
 
 [[projects]]
-  branch = "master"
-  digest = "1:53bc4cd4914cd7cd52139990d5170d6dc99067ae31c56530621b18b35fc30318"
-  name = "github.com/mitchellh/mapstructure"
-  packages = ["."]
+  digest = "1:ff5ebae34cfbf047d505ee150de27e60570e8c394b3b8fdbb720ff6ac71985fc"
+  name = "github.com/matttproud/golang_protobuf_extensions"
+  packages = ["pbutil"]
   pruneopts = "UT"
-  revision = "3536a929edddb9a5b34bd6861dc4a9647cb459fe"
+  revision = "c12348ce28de40eed0136aa2b644d0ee0650e56c"
+  version = "v1.0.1"
 
 [[projects]]
   digest = "1:33422d238f147d247752996a26574ac48dcf472976eda7f5134015f06bf16563"
@@ -300,6 +211,50 @@
   pruneopts = "UT"
   revision = "ba968bfe8b2f7e042a574c888954fccecfa385b4"
   version = "v0.8.1"
+
+[[projects]]
+  digest = "1:eb04f69c8991e52eff33c428bd729e04208bf03235be88e4df0d88497c6861b9"
+  name = "github.com/prometheus/client_golang"
+  packages = [
+    "prometheus",
+    "prometheus/internal",
+    "prometheus/promhttp",
+  ]
+  pruneopts = "UT"
+  revision = "170205fb58decfd011f1550d4cfb737230d7ae4f"
+  version = "v1.1.0"
+
+[[projects]]
+  digest = "1:0db23933b8052702d980a3f029149b3f175f7c0eea0cff85b175017d0f2722c0"
+  name = "github.com/prometheus/client_model"
+  packages = ["go"]
+  pruneopts = "UT"
+  revision = "7bc5445566f0fe75b15de23e6b93886e982d7bf9"
+  version = "v0.2.0"
+
+[[projects]]
+  digest = "1:c1139d84a6fab0d2ebfda1ab3fe5f822162be845045db230aa1c672927d320c8"
+  name = "github.com/prometheus/common"
+  packages = [
+    "expfmt",
+    "internal/bitbucket.org/ww/goautoneg",
+    "model",
+  ]
+  pruneopts = "UT"
+  revision = "d978bcb1309602d68bb4ba69cf3f8ed900e07308"
+  version = "v0.9.1"
+
+[[projects]]
+  digest = "1:ec0ff4bd619a67065e34d6477711ed0117e335f99059a4c508e0fe21cfe7b304"
+  name = "github.com/prometheus/procfs"
+  packages = [
+    ".",
+    "internal/fs",
+    "internal/util",
+  ]
+  pruneopts = "UT"
+  revision = "6d489fc7f1d9cd890a250f3ea3431b1744b9623f"
+  version = "v0.0.8"
 
 [[projects]]
   branch = "master"
@@ -359,9 +314,12 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:249fd56fb36a223aee164e2dc35e3b3a1b92dd3873dfb60216280b9fb9d4a784"
+  digest = "1:3398992b8f4b00ce4a6a5f9770008cf66dcff8f128b51eeab8c1f657096cac8f"
   name = "golang.org/x/sys"
-  packages = ["unix"]
+  packages = [
+    "unix",
+    "windows",
+  ]
   pruneopts = "UT"
   revision = "15dcb6c0061f497a3f66e3ea034b629c6dd4d99e"
 
@@ -439,6 +397,8 @@
     "github.com/jinzhu/gorm",
     "github.com/lib/pq",
     "github.com/op/go-logging",
+    "github.com/prometheus/client_golang/prometheus",
+    "github.com/prometheus/client_golang/prometheus/promhttp",
     "github.com/rubenv/sql-migrate",
     "github.com/sirupsen/logrus",
     "github.com/speps/go-hashids",
