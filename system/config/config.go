@@ -115,4 +115,13 @@ func checkEnv(conf *AppConfig) {
 	if autoMigrate := os.Getenv("AUTO_MIGRATE"); autoMigrate != "" {
 		conf.AutoMigrate, _ = strconv.ParseBool(autoMigrate)
 	}
+
+	if metricPort := os.Getenv("METRIC_PORT"); metricPort != "" {
+		v, _ := strconv.ParseInt(metricPort, 10, 32)
+		conf.MetricPort = int(v)
+	}
+
+	if mode := os.Getenv("MODE"); mode != "" {
+		conf.Mode = RunMode(mode)
+	}
 }

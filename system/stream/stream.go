@@ -29,7 +29,6 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
 )
 
 var (
@@ -54,10 +53,6 @@ func NewStreamService(hub *Hub,
 		Hub:      hub,
 		adaptors: adaptors,
 	}
-}
-
-func (s *StreamService) Broadcast(message []byte) {
-	s.Hub.Broadcast(message)
 }
 
 func (s *StreamService) Subscribe(command string, f func(client *Client, msg Message)) {
@@ -138,28 +133,10 @@ func (w *StreamService) Ws(ctx *gin.Context) {
 		}
 	}
 
-	// CORS
-	ctx.Writer.Header().Del("Access-Control-Allow-Credentials")
-
-	conn, err := wsupgrader.Upgrade(ctx.Writer, ctx.Request, nil)
+	client, err := NewClient(ctx, clientId, token, clientType)
 	if err != nil {
-		log.Errorf("Failed to set websocket upgrade: %v", err)
+		log.Error(err.Error())
 		return
-	}
-	if _, ok := err.(websocket.HandshakeError); ok {
-		ctx.AbortWithError(400, errors.New("not a websocket handshake"))
-		return
-	}
-
-	client := &Client{
-		Id:          clientId,
-		Connect:     conn,
-		Ip:          ctx.ClientIP(),
-		Send:        make(chan []byte),
-		Token:       token,
-		Type:        clientType,
-		connected:   time.Now(),
-		lastMsgTime: time.Now(),
 	}
 
 	go client.WritePump()
@@ -167,6 +144,8 @@ func (w *StreamService) Ws(ctx *gin.Context) {
 }
 
 func (s *StreamService) GetClientByIdAndType(clientId string, clientType ClientType) (client *Client, err error) {
-	client, err = s.Hub.GetClientByIdAndType(clientId, clientType)
+	if clientType == ClientTypeServer {
+		client, err = s.Hub.GetClientServer(clientId)
+	}
 	return
 }

@@ -20,12 +20,15 @@ package stream
 
 import (
 	"encoding/json"
+	"errors"
+	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"sync"
 	"time"
 )
 
 type Client struct {
+	Stat
 	Id          string
 	Connect     *websocket.Conn
 	Ip          string
@@ -35,7 +38,35 @@ type Client struct {
 	writeLock   sync.Mutex
 	lastMsgTime time.Time
 	connected   time.Time
-	server      *Client
+}
+
+func NewClient(ctx *gin.Context, clientId, token string, clientType ClientType) (client *Client, err error) {
+
+	// CORS
+	ctx.Writer.Header().Del("Access-Control-Allow-Credentials")
+
+	conn, err := wsupgrader.Upgrade(ctx.Writer, ctx.Request, nil)
+	if err != nil {
+		log.Errorf("Failed to set websocket upgrade: %v", err)
+		return
+	}
+	if _, ok := err.(websocket.HandshakeError); ok {
+		ctx.AbortWithError(400, errors.New("not a websocket handshake"))
+		return
+	}
+
+	client = &Client{
+		Id:          clientId,
+		Connect:     conn,
+		Ip:          ctx.ClientIP(),
+		Send:        make(chan []byte),
+		Token:       token,
+		Type:        clientType,
+		connected:   time.Now(),
+		lastMsgTime: time.Now(),
+	}
+
+	return
 }
 
 func (c *Client) Notify(t, b string) {
@@ -53,6 +84,7 @@ func (c *Client) Write(payload []byte) (err error) {
 
 func (c *Client) write(opCode int, payload []byte) (err error) {
 	c.writeLock.Lock()
+	c.sentInc()
 	c.Connect.SetWriteDeadline(time.Now().Add(writeWait))
 	err = c.Connect.WriteMessage(opCode, payload)
 	c.writeLock.Unlock()
@@ -104,6 +136,3 @@ func (c *Client) updateLastMsgTime() {
 	c.lastMsgTime = time.Now()
 }
 
-func (c *Client) UpdateServer(server *Client) {
-	c.server = server
-}
