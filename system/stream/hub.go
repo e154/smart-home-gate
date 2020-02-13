@@ -37,11 +37,9 @@ const (
 )
 
 type Hub struct {
-	adaptors *adaptors.Adaptors
-	//broadcast    chan []byte
-	interrupt    chan struct{}
-	sessionsLock sync.Mutex
-	//sessions        map[*Client]bool
+	adaptors        *adaptors.Adaptors
+	interrupt       chan struct{}
+	sessionsLock    sync.Mutex
 	servers         map[string]*Client
 	mobiles         map[string]*Client
 	subscribersLock sync.Mutex
@@ -52,11 +50,9 @@ func NewHub(adaptors *adaptors.Adaptors,
 	graceful_service *graceful_service.GracefulService) *Hub {
 
 	hub := &Hub{
-		adaptors: adaptors,
-		//sessions:    make(map[*Client]bool),
-		servers: make(map[string]*Client),
-		mobiles: make(map[string]*Client),
-		//broadcast:   make(chan []byte, maxMessageSize),
+		adaptors:    adaptors,
+		servers:     make(map[string]*Client),
+		mobiles:     make(map[string]*Client),
 		subscribers: make(map[string]func(client *Client, msg Message)),
 		interrupt:   make(chan struct{}, 1),
 	}
@@ -81,8 +77,10 @@ func (h *Hub) AddClient(client *Client) {
 
 	defer func() {
 		h.sessionsLock.Lock()
-		if _, ok := h.servers[client.Id]; ok {
+		if client.Type == ClientTypeServer {
 			delete(h.servers, client.Id)
+		} else {
+			delete(h.mobiles, client.Id)
 		}
 		h.sessionsLock.Unlock()
 		log.Infof("websocket session from ip(%s) closed, id(%s)", client.Ip, clientId)
