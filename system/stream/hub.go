@@ -77,8 +77,10 @@ func (h *Hub) AddClient(client *Client) {
 
 	defer func() {
 		h.sessionsLock.Lock()
-		if _, ok := h.servers[client.Id]; ok {
+		if client.Type == ClientTypeServer {
 			delete(h.servers, client.Id)
+		} else {
+			delete(h.mobiles, client.Id)
 		}
 		h.sessionsLock.Unlock()
 		log.Infof("websocket session from ip(%s) closed, id(%s)", client.Ip, clientId)
