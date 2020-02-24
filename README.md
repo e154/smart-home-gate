@@ -9,9 +9,14 @@ Smart home mobile gate
 [Modbus device controller](https://github.com/e154/smart-home-modbus-ctrl-v1/) |
 [Mobile app](https://github.com/e154/smart-home-app/)
 
-[![Build Status](https://travis-ci.org/e154/smart-home-gate.svg?branch=master)](https://travis-ci.org/e154/smart-home-gate)
 ![status](https://img.shields.io/badge/status-beta-yellow.svg)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
+|Branch      |Status   |
+|------------|---------|
+|master      | [![Build Status](https://travis-ci.org/e154/smart-home-gate.svg?branch=master)](https://travis-ci.org/e154/smart-home-gate?branch=master)   |
+|dev         | [![Build Status](https://travis-ci.org/e154/smart-home-gate.svg?branch=develop)](https://travis-ci.org/e154/smart-home-gate?branch=develop) |
+
 
 Attention! The project is under active development.
 ---------
@@ -27,13 +32,11 @@ It is possible to connect a large number of servers and client applications to t
 ### Installation for development
 
 ```bash
-go get -u github.com/golang/dep/cmd/dep
-
 git clone https://github.com/e154/smart-home-gate $GOPATH/src/github.com/e154/smart-home-gate
 
 cd $GOPATH/src/github.com/e154/smart-home-gate
 
-dep ensure
+go mod vendor
 
 go build
 ```

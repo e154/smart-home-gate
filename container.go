@@ -25,7 +25,6 @@ import (
 	"github.com/e154/smart-home-gate/api/websocket"
 	"github.com/e154/smart-home-gate/endpoint"
 	"github.com/e154/smart-home-gate/system/config"
-	"github.com/e154/smart-home-gate/system/dig"
 	"github.com/e154/smart-home-gate/system/graceful_service"
 	"github.com/e154/smart-home-gate/system/logging"
 	"github.com/e154/smart-home-gate/system/metrics"
@@ -33,6 +32,7 @@ import (
 	"github.com/e154/smart-home-gate/system/orm"
 	"github.com/e154/smart-home-gate/system/stream"
 	"github.com/e154/smart-home-gate/system/stream_proxy"
+	"go.uber.org/dig"
 )
 
 func BuildContainer() (container *dig.Container) {
