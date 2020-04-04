@@ -1,0 +1,18 @@
+[Unit]
+Description=Smart home gate
+After=multi-user.target
+Requires=postgresql.service
+
+
+[Service]
+Type=simple
+Restart=always
+WorkingDirectory=/opt/smart-home/gate
+ExecStart=/opt/smart-home/gate/gate
+
+User=smart_home
+Group=smart_home
+
+
+[Install]
+WantedBy=multi-user.target
