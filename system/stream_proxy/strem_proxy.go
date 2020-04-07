@@ -216,6 +216,9 @@ func (s *StreamProxy) controller(endpoint string, ctx *gin.Context) {
 		url = strings.Replace(ctx.Request.RequestURI, "/server", "", -1)
 	case AlexaGateProxy:
 		url = strings.Replace(ctx.Request.RequestURI, "/alexa", "", -1)
+	default:
+		log.Errorf("unknown endpoint %v", endpoint)
+		return
 	}
 
 	streamRequestModel := &StreamRequestModel{
