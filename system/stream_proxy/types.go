@@ -34,3 +34,8 @@ type StreamResponseModel struct {
 	Body   []byte      `json:"body"`
 	Header http.Header `json:"header"`
 }
+
+const (
+	MobileGateProxy = string("mobile_gate_proxy")
+	AlexaGateProxy  = string("alexa_gate_proxy")
+)

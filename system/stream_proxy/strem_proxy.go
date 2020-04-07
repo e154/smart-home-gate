@@ -59,7 +59,8 @@ func NewStreamProxy(httpsServer *server.Server,
 		adaptors:      adaptors,
 	}
 
-	proxy.engine.Any("/server/*any", proxy.auth, proxy.controller)
+	proxy.engine.Any("/server/*any", proxy.auth, proxy.serverController)
+	proxy.engine.Any("/alexa/*any", proxy.auth, proxy.alexaController)
 
 	graceful.Subscribe(proxy)
 
@@ -168,7 +169,15 @@ func (s *StreamProxy) auth(ctx *gin.Context) {
 	ctx.AbortWithError(403, errors.New("unauthorized access"))
 }
 
-func (s *StreamProxy) controller(ctx *gin.Context) {
+func (s *StreamProxy) alexaController(ctx *gin.Context) {
+	s.controller(AlexaGateProxy, ctx)
+}
+
+func (s *StreamProxy) serverController(ctx *gin.Context) {
+	s.controller(MobileGateProxy, ctx)
+}
+
+func (s *StreamProxy) controller(endpoint string, ctx *gin.Context) {
 
 	defer func() {
 		var err error
@@ -201,7 +210,14 @@ func (s *StreamProxy) controller(ctx *gin.Context) {
 		return
 	}
 
-	url := strings.Replace(ctx.Request.RequestURI, "/server", "", -1)
+	var url string
+	switch endpoint {
+	case MobileGateProxy:
+		url = strings.Replace(ctx.Request.RequestURI, "/server", "", -1)
+	case AlexaGateProxy:
+		url = strings.Replace(ctx.Request.RequestURI, "/alexa", "", -1)
+	}
+
 	streamRequestModel := &StreamRequestModel{
 		URI:    url,
 		Method: strings.ToUpper(ctx.Request.Method),
@@ -237,7 +253,7 @@ func (s *StreamProxy) controller(ctx *gin.Context) {
 		"request": streamRequestModel,
 	}
 
-	err = s.Send("mobile_gate_proxy", payload, client, ctx, func(msg stream.Message) {
+	err = s.Send(endpoint, payload, client, ctx, func(msg stream.Message) {
 
 		//debug.Println(msg.Payload)
 
