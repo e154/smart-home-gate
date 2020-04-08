@@ -161,7 +161,7 @@ __host_build() {
 
     mkdir -p ${TMP_DIR}
 
-    OUTPUT="server-linux-amd64"
+    OUTPUT="gate-linux-amd64"
 
     echo ""
     echo "build command:"
