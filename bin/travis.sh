@@ -82,6 +82,9 @@ main() {
     --build)
     __build
     ;;
+    --host_build)
+    __host_build
+    ;;
     --docker_deploy)
     __docker_deploy
     ;;
@@ -152,6 +155,32 @@ __build() {
 
     # create arch
     tar -zcf ${HOME}/${ARCHIVE} .
+}
+
+__host_build() {
+
+    mkdir -p ${TMP_DIR}
+
+    OUTPUT="server-linux-amd64"
+
+    echo ""
+    echo "build command:"
+    echo "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -ldflags '${GOBUILD_LDFLAGS}' -o ${TMP_DIR}/${OUTPUT}"
+    echo ""
+
+    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -ldflags "${GOBUILD_LDFLAGS}" -o ${TMP_DIR}/${OUTPUT}
+
+    mkdir -p ${TMP_DIR}/api/server/docs/
+    cp ${ROOT}/api/server/docs/swagger.yaml ${TMP_DIR}/api/server/docs/
+
+    cp -r ${ROOT}/conf ${TMP_DIR}
+    cp ${ROOT}/conf/config.dev.json ${TMP_DIR}/conf/config.json
+    cp ${ROOT}/LICENSE ${TMP_DIR}
+    cp ${ROOT}/README* ${TMP_DIR}
+    cp ${ROOT}/contributors.txt ${TMP_DIR}
+    cp ${ROOT}/bin/docker/Dockerfile ${TMP_DIR}
+
+    cp ${ROOT}/bin/gate ${TMP_DIR}
 }
 
 __docker_deploy() {
