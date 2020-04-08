@@ -89,7 +89,7 @@ func (n *Mobile) GetById(verId string) (ver *m.Mobile, err error) {
 	id, err := common.GetIdFromHash(verId, HashSalt)
 	if err != nil {
 		log.Error(err.Error())
-		return 
+		return
 	}
 
 	var dbVer *db.Mobile
@@ -188,6 +188,7 @@ func (n *Mobile) fromDb(dbVer *db.Mobile) (ver *m.Mobile) {
 		Id:        id,
 		Token:     dbVer.Token,
 		ServerId:  serverId,
+		RequestId: dbVer.RequestId,
 		CreatedAt: dbVer.CreatedAt,
 		UpdatedAt: dbVer.UpdatedAt,
 	}
@@ -211,6 +212,7 @@ func (n *Mobile) toDb(ver *m.Mobile) (dbVer *db.Mobile, err error) {
 		Id:        id,
 		ServerId:  serverId,
 		Token:     ver.Token,
+		RequestId: ver.RequestId,
 		CreatedAt: ver.CreatedAt,
 		UpdatedAt: ver.UpdatedAt,
 	}

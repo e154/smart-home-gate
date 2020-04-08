@@ -82,6 +82,9 @@ main() {
     --build)
     __build
     ;;
+    --host_build)
+    __host_build
+    ;;
     --docker_deploy)
     __docker_deploy
     ;;
@@ -154,6 +157,32 @@ __build() {
     tar -zcf ${HOME}/${ARCHIVE} .
 }
 
+__host_build() {
+
+    mkdir -p ${TMP_DIR}
+
+    OUTPUT="gate-linux-amd64"
+
+    echo ""
+    echo "build command:"
+    echo "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -ldflags '${GOBUILD_LDFLAGS}' -o ${TMP_DIR}/${OUTPUT}"
+    echo ""
+
+    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -ldflags "${GOBUILD_LDFLAGS}" -o ${TMP_DIR}/${OUTPUT}
+
+    mkdir -p ${TMP_DIR}/api/server/docs/
+    cp ${ROOT}/api/server/docs/swagger.yaml ${TMP_DIR}/api/server/docs/
+
+    cp -r ${ROOT}/conf ${TMP_DIR}
+    cp ${ROOT}/conf/config.dev.json ${TMP_DIR}/conf/config.json
+    cp ${ROOT}/LICENSE ${TMP_DIR}
+    cp ${ROOT}/README* ${TMP_DIR}
+    cp ${ROOT}/contributors.txt ${TMP_DIR}
+    cp ${ROOT}/bin/docker/Dockerfile ${TMP_DIR}
+
+    cp ${ROOT}/bin/gate ${TMP_DIR}
+}
+
 __docker_deploy() {
 
     cd ${TMP_DIR}
@@ -163,13 +192,15 @@ __docker_deploy() {
     echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
     # build image
-    docker build -f ${TMP_DIR}/Dockerfile -t ${DOCKER_ACCOUNT}/${IMAGE} .
+    DOCKER_BUILDKIT=1 docker build -f ${TMP_DIR}/Dockerfile -t ${DOCKER_ACCOUNT}/${IMAGE} .
     # set tag to builded image
     docker tag ${DOCKER_ACCOUNT}/${IMAGE} ${DOCKER_IMAGE_VER}
     docker tag ${DOCKER_ACCOUNT}/${IMAGE} ${DOCKER_IMAGE_LATEST}
     # push tagged image
     docker push ${DOCKER_IMAGE_VER}
     docker push ${DOCKER_IMAGE_LATEST}
+     # clear system from dangling images
+    docker image rm "$(docker image ls -f dangling=true -q)"
 }
 
 main "$@"

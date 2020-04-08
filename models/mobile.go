@@ -29,15 +29,15 @@ type Mobile struct {
 	Id        string    `json:"id"`
 	Token     uuid.UUID `json:"token"`
 	ServerId  string    `json:"server_id"`
+	RequestId string    `json:"request_id"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
 func (s Mobile) GenAccessToken() (token string) {
 
-	var requestId = common.RandomString(10, common.Charset)
 	var timestamp = s.CreatedAt.Unix()
-	token = fmt.Sprintf("%s-%s-%d-%s", s.Id, requestId, timestamp, common.Sha256(requestId+s.Token.String()+fmt.Sprintf("%d", timestamp)))
+	token = fmt.Sprintf("%s-%s-%d-%s", s.Id, s.RequestId, timestamp, common.Sha256(s.RequestId+s.Token.String()+fmt.Sprintf("%d", timestamp)))
 
 	return
 }
