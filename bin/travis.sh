@@ -192,13 +192,15 @@ __docker_deploy() {
     echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
     # build image
-    docker build -f ${TMP_DIR}/Dockerfile -t ${DOCKER_ACCOUNT}/${IMAGE} .
+    DOCKER_BUILDKIT=1 docker docker build -f ${TMP_DIR}/Dockerfile -t ${DOCKER_ACCOUNT}/${IMAGE} .
     # set tag to builded image
     docker tag ${DOCKER_ACCOUNT}/${IMAGE} ${DOCKER_IMAGE_VER}
     docker tag ${DOCKER_ACCOUNT}/${IMAGE} ${DOCKER_IMAGE_LATEST}
     # push tagged image
     docker push ${DOCKER_IMAGE_VER}
     docker push ${DOCKER_IMAGE_LATEST}
+     # clear system from dangling images
+    docker image rm "$(docker image ls -f dangling=true -q)"
 }
 
 main "$@"
