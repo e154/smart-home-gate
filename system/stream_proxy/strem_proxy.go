@@ -25,6 +25,7 @@ import (
 	"github.com/e154/smart-home-gate/adaptors"
 	"github.com/e154/smart-home-gate/api/server"
 	"github.com/e154/smart-home-gate/common"
+	"github.com/e154/smart-home-gate/common/debug"
 	m "github.com/e154/smart-home-gate/models"
 	"github.com/e154/smart-home-gate/system/graceful_service"
 	"github.com/e154/smart-home-gate/system/stream"
@@ -228,16 +229,16 @@ func (s *StreamProxy) controller(endpoint string, ctx *gin.Context) {
 		Header: ctx.Request.Header,
 	}
 
-	//fmt.Println("-------")
-	//fmt.Println("request")
-	//fmt.Println("-------")
-	//fmt.Println(streamRequestModel.URI)
-	//fmt.Println(streamRequestModel.Method)
-	//fmt.Println(streamRequestModel.Header)
-	//fmt.Println(string(streamRequestModel.Body))
+	fmt.Println("-------")
+	fmt.Println("request")
+	fmt.Println("-------")
+	fmt.Println(streamRequestModel.URI)
+	fmt.Println(streamRequestModel.Method)
+	fmt.Println(streamRequestModel.Header)
+	fmt.Println(string(streamRequestModel.Body))
 
-	//fmt.Printf("serverId: %v\n", serverObj.Id)
-	//fmt.Printf("streamRequestModel: %v\n", streamRequestModel)
+	fmt.Printf("serverId: %v\n", serverObj.Id)
+	fmt.Printf("streamRequestModel: %v\n", streamRequestModel)
 
 	var client *stream.Client
 	if client, err = s.streamService.GetClientByIdAndType(serverObj.Id, stream.ClientTypeServer); err != nil {
@@ -250,7 +251,8 @@ func (s *StreamProxy) controller(endpoint string, ctx *gin.Context) {
 		return
 	}
 
-	//debug.Println(client)
+	fmt.Println("-----")
+	debug.Println(client)
 
 	payload := map[string]interface{}{
 		"request": streamRequestModel,
@@ -270,12 +272,12 @@ func (s *StreamProxy) controller(endpoint string, ctx *gin.Context) {
 			log.Error(err.Error())
 		}
 
-		//fmt.Println("----------")
-		//fmt.Println("response")
-		//fmt.Println("----------")
-		//fmt.Println(r.Code)
-		//fmt.Println(r.Header)
-		//fmt.Println(string(r.Body))
+		fmt.Println("----------")
+		fmt.Println("response")
+		fmt.Println("----------")
+		fmt.Println(r.Code)
+		fmt.Println(r.Header)
+		fmt.Println(string(r.Body))
 
 		for k, _ := range r.Header {
 			ctx.Header(k, r.Header.Get(k))
