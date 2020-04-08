@@ -20,6 +20,7 @@ package endpoint
 
 import (
 	"errors"
+	"github.com/e154/smart-home-gate/common"
 	m "github.com/e154/smart-home-gate/models"
 	"github.com/e154/smart-home-gate/system/uuid"
 )
@@ -35,8 +36,9 @@ func NewMobile(common *CommonEndpoint) *Mobile {
 func (c *Mobile) RegisterMobile(server *m.Server) (token string, err error) {
 
 	mobileClient := &m.Mobile{
-		Token:    uuid.NewV4(),
-		ServerId: server.Id,
+		Token:     uuid.NewV4(),
+		ServerId:  server.Id,
+		RequestId: common.RandomString(10, common.Charset),
 	}
 
 	if _, err = c.adaptors.Mobile.Add(mobileClient); err != nil {
@@ -66,7 +68,6 @@ func (c *Mobile) RemoveMobileToken(server *m.Server, token string) (err error) {
 		err = errors.New("mobile not found")
 		return
 	}
-
 
 	err = c.adaptors.Mobile.Remove(mobile)
 

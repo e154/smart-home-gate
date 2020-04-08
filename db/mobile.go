@@ -33,6 +33,7 @@ type Mobile struct {
 	Token     uuid.UUID
 	ServerId  int64
 	Server    *Server
+	RequestId string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
